@@ -15,6 +15,7 @@ class Transaction(models.Model):
     is_income = models.BooleanField()
     #photo = models.
     class Meta:
+        db_table = 'transaction'
         ordering = ('-date',)
 
     def get_url(self):

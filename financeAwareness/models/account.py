@@ -11,5 +11,8 @@ class Account(models.Model):
     accomplished_date = models.DateField(null=True,blank=True)
     goal_value = models.FloatField(null=True,blank=True)
 
+    class Meta:
+        db_table = 'account'
+
     def __str__(self):
         return self.name

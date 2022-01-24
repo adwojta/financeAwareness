@@ -7,7 +7,10 @@ class Category(models.Model):
     user_id = models.ForeignKey(User,on_delete=models.CASCADE,related_name="categories")  
     master_category = models.ForeignKey('self',on_delete=models.CASCADE,related_name="subcategories", null=True, blank=True)
     income = models.BooleanField(null=True, blank=True)
-    
+
+    class Meta:
+        db_table = 'category'
+
     def get_details_url(self):
         return reverse('financeAwareness:category_details',args=[self.id])
 

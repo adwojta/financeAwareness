@@ -9,5 +9,9 @@ class Transfer(models.Model):
     to_account = models.ForeignKey(Account,on_delete=models.CASCADE,related_name="to_account")
     user_id = models.ForeignKey(User,on_delete=models.CASCADE,related_name="user_transfers")
 
+    class Meta:
+        db_table = 'transfer'
+        ordering = ('-date',)
+    
     def __str__(self):
         return "Transfer z dnia " + str(self.date)

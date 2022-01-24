@@ -14,3 +14,6 @@ class RecurringTransaction(models.Model):
     type = models.CharField(max_length=100)
     is_active = models.BooleanField()
     is_income = models.BooleanField()
+
+    class Meta:
+        db_table = 'recurringTransaction'

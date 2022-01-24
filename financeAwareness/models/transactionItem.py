@@ -10,5 +10,8 @@ class TransactionItem(models.Model):
     item_value = models.FloatField()
     is_planned = models.BooleanField()
 
+    class Meta:
+        db_table = 'transactionItem'
+    
     def __str__(self):
         return self.item_name
