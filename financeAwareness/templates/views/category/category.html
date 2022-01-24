@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %} Kategorie {% endblock %}
+
+{% block content %}
+<div class="transaction">
+<p>Wydatki</p>
+{% for expense in expenses %}
+    <div class="item">
+    <a href="{{expense.get_details_url}}">{{expense.name}}</a>
+    </div>
+{% endfor %}
+<div class="item">
+    <a href="{% url "financeAwareness:new_category" %}">+</a>
+    </div>
+</div>
+
+<div class="transaction">
+    <p>Przychody</p>
+    {% for income in incomes %}
+        <div class="item">
+        <a href="{{income.get_details_url}}">{{income.name}}</a>
+        </div>
+    {% endfor %}
+    <div class="item">
+        <a href="{% url "financeAwareness:new_category" "income" %}">+</a>
+        </div>
+</div>
+
+{% endblock %}

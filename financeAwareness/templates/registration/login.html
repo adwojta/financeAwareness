@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %} Logowanie {% endblock %}
+{% block content %}
+<div style="background-color: rgb(109, 255, 236);"></div>
+ {% if form.errors %}   
+<p> Nazwa użytkownika lub hasło są nieprawidłowe</p>
+
+{% else %}
+<p>Logowanie</p>
+{% endif %}
+<form action="{% url 'financeAwareness:login' %}" method="post">
+    {{form.as_p}}
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ next }}"/>
+    <p><input type="submit" value="Zaloguj"></p>
+</form>
+</div>
+{% endblock %}

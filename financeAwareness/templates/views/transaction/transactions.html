@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %} Transakcje {% endblock %}
+
+{% block content %}
+
+<div class="transaction">
+{% for transaction in transactions %}
+
+    <div class="item">
+    <a href="{{transaction.get_url}}">{{transaction.name}}</a>
+    <p>{{transaction.value}}</p>
+    <p>{{transaction.date | date}}</p>
+    </div>
+{% endfor %}
+</div>
+{% endblock %}

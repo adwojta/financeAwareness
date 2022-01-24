@@ -1,0 +1,43 @@
+{% load financeAwareness_tags %}
+{% load static %}
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>{% block title %}{% endblock %}</title>
+        <link href="{% static "css/site.css" %}" rel="stylesheet">
+        
+    </head>
+    <body>
+        <div id="header">
+            <h1>FinanceAwareness</h1>
+            
+            {% if request.user.is_authenticated %}
+            {% available_funds request.user.id %}
+            <a href="{% url "financeAwareness:logout" %}">Wyloguj</a>
+            {% else %}
+            <a href="{% url "financeAwareness:login" %}">Zaloguj</a>
+            {% endif %}
+        </div>
+        <div id="main">
+            {% if request.user.is_authenticated %}
+            <div id="side">
+                <h1>Menu</h1>
+                <a href="{% url "financeAwareness:transactions" %}">Transakcje</a>
+                <a href="{% url "financeAwareness:new_transaction" %}">Dodaj transakcje</a>
+                <a href="{% url "financeAwareness:categories" %}">Kategorie</a>
+                <a href="{% url "financeAwareness:accounts" %}">Konta i cele</a>
+                <a href="">Raporty</a>
+                <a href="{% url "financeAwareness:recurrings" %}">Stałe transakcje</a>
+                <a href="">Profil</a>
+            </div>  
+            {% endif %}
+            <div id="content">
+                {% block content %}
+                {% endblock %}
+            </div>
+        </div>
+        <div id="footer">
+            <h1>Praca inżynierska</h1>
+        </div>  
+    </body>
+</html>

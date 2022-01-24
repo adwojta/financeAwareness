@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %} Dodaj Transakcje {% endblock %}
+{% block content %}
+<div style="background-color: rgb(216, 255, 109);">
+    <script>
+        function change_transaction_value(){
+            let items = document.getElementsByName("item_value")
+            let transaction_value = document.getElementsByName("value")
+            let sum = 0
+            for(var i=0;i < items.length;i++ ){
+                sum += parseInt(items[i].value)
+            }
+            transaction_value[0].value = sum
+        }
+        function add_item(){
+            let elem = document.getElementById('item_1');
+            let id = document.getElementsByClassName('transaction_item');
+
+            clone_div = elem.cloneNode(true);
+            new_div_id ='item_'+(parseInt(id[id.length-1].id.slice(5))+1)
+            clone_div.id = new_div_id
+            document.getElementById('items').appendChild(clone_div)
+
+            elem = document.getElementById(new_div_id);
+            elem.children[0].style.display=""
+        }
+        function delete_item(element){
+            let div_id = element.parentNode.id
+            let div = document.getElementById(div_id)
+            div.remove()
+        }
+    </script>
+<form action="#" method="post">
+    {{transaction_form.as_p}}
+    {% csrf_token %}
+    <div id='items'>
+    {% for transaction_item_form in transaction_item_forms %}
+    <div style="background-color: rgb(0, 123, 206);border-radius: 5px;" id='item_1' class = 'transaction_item'>
+        <input type="button" onclick="delete_item(this)" value="Usuń" style="display: none;">
+        {{transaction_item_form.as_p}}
+    </div>
+    
+
+    {% endfor %}
+    </div>
+    <input type="button" onclick="add_item()" value="Dodaj element">
+    <p><input type="submit" value="Dodaj"></p>
+</form>
+</div>
+{% endblock %}

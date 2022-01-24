@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %} Konta {% endblock %}
+
+{% block content %}
+
+<div class="transaction">
+{% for account in accounts %}
+
+    <div class="item">
+    <p>{{account.name}}</p>
+    <p>{{account.value}}</p>
+    <a href="{% url "financeAwareness:account_form_update" account.id %}">+</a>
+    <a href="{% url "financeAwareness:account_form_delete" account.id %}">-</a>
+    </div>
+{% endfor %}
+<a href="{% url "financeAwareness:new_account" %}">+</a>
+</div>
+
+<div class="transaction">
+    {% for goal in goals %}
+    
+        <div class="item">
+        <p>{{goal.name}}</p>
+        <p>{{goal.value}}</p>
+        <p>{{goal.goal_value}}</p>
+        <a href="{% url "financeAwareness:saving_goal_form_update" goal.id %}">+</a>
+        <a href="{% url "financeAwareness:saving_goal_form_delete" goal.id %}">-</a>
+        </div>
+    {% endfor %}
+    <a href="{% url "financeAwareness:saving_goal_form" %}">+</a>
+    </div>
+    <a href="{% url "financeAwareness:transfer_form" %}">+</a>
+{% endblock %}

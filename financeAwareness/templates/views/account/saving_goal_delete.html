@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %} Dodaj kategorie {% endblock %}
+{% block content %}
+<div style="background-color: rgb(109, 255, 121);"></div>
+
+<form action="" method="post">
+    {% csrf_token %}
+    <p>Czy na pewno chcesz usunac konto?</p>
+    <p><input type="submit" value="Tak"></p>
+    <a href="{% url "financeAwareness:accounts" %}">Nie</a>
+</form>
+</div>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block title %} Dodaj kategorie {% endblock %}
+{% block content %}
+<div style="background-color: rgb(109, 255, 121);"></div>
+
+<form action="" method="post">
+    {{subcategory_form.as_p}}
+    {% csrf_token %}
+    <p><input type="submit" value="Dodaj"></p>
+</form>
+</div>
+{% endblock %}
