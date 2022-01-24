@@ -13,5 +13,16 @@
     <p>{{transaction.date | date}}</p>
     </div>
 {% endfor %}
+{% for transfer in transfers %}
+
+    <div class="item">
+    <p>{{transfer.value}}</p>
+    <p>{{transfer.from_account}}</p>
+    <p>{{transfer.to_account}}</p>
+    <p>{{transfer.date | date}}</p>
+    <a href="{% url "financeAwareness:transfer_form_update" transfer.id %}">+</a>
+    <a href="{% url "financeAwareness:transfer_form_delete" transfer.id %}">-</a>
+    </div>
+{% endfor %}
 </div>
 {% endblock %}

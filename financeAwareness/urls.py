@@ -36,8 +36,8 @@ urlpatterns = [
 
     #transfer
     path('accounts/transfer/new',views.transfer_form,name='transfer_form'),
-    path('accounts/transfer/update/<int:transfer_id>',views.saving_goal_form_update,name='saving_goal_form_update'),
-    path('accounts/transfer/delete/<int:transfer_id>',views.saving_goal_form_delete,name='saving_goal_form_delete'),
+    path('accounts/transfer/update/<int:transfer_id>',views.transfer_form_update,name='transfer_form_update'),
+    path('accounts/transfer/delete/<int:transfer_id>',views.transfer_form_delete,name='transfer_form_delete'),
 
     #saving goal
     path('savings/new',views.saving_goal_form,name='saving_goal_form'),

@@ -5,10 +5,10 @@
 <div style="background-color: rgb(109, 255, 121);"></div>
 
 <form action="" method="post">
-    {{transfer_form.as_p}}
     {% csrf_token %}
-    <p><input type="submit" value="Zakutalizuj"></p>
-    <a href="{% url "financeAwareness:transactions" %}">Wróć</a>
+    <p>Czy na pewno chcesz usunac konto?</p>
+    <p><input type="submit" value="Tak"></p>
+    <a href="{% url "financeAwareness:transactions" %}">Nie</a>
 </form>
 </div>
 {% endblock %}
