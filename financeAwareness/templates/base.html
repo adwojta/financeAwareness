@@ -1,43 +1,106 @@
 {% load financeAwareness_tags %}
 {% load static %}
+
 <!DOCTYPE html>
 <html>
     <head>
         <title>{% block title %}{% endblock %}</title>
         <link href="{% static "css/site.css" %}" rel="stylesheet">
-        
+        <link href="{% static "css/bootstrap.min.css" %}" rel="stylesheet">
+        <script src="{% static "js/bootstrap.min.js" %}"></script>
+
     </head>
     <body>
-        <div id="header">
-            <h1>FinanceAwareness</h1>
-            
+        <header>
+            <nav class="navbar navbar-expand-lg navbar-dark container" id="navbar" >
+                <div class="container-fluid" >
+                    <span class="navbar-brand">FinanceAwareness</span>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                        <span class="navbar-toggler-icon"></span>
+                      </button>                              
+                    <div class="collapse navbar-collapse justify-content-center" id="navbarNav">               
+                        <ul class="navbar-nav">
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url "financeAwareness:transactions" %}">Transakcje</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url "financeAwareness:categories" %}">Kategorie</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url "financeAwareness:accounts" %}">Konta i cele</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url "financeAwareness:password_change" %}">Raporty</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url "financeAwareness:recurrings" %}">Stałe transakcje</a>
+                            </li>
+                            {% if request.user.is_authenticated %}                   
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url "financeAwareness:logout" %}">Wyloguj</a>
+                            </li>    
+                            {% else %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url "financeAwareness:login" %}">Zaloguj</a>
+                            </li>
+                            {% endif %}
+                        </ul>              
+                    </div>                     
+                </div>
+            </nav>
+        </header>
+        
+        
+        <div class="container min-vh-100 p-3">
             {% if request.user.is_authenticated %}
-            {% available_funds request.user.id %}
-            <a href="{% url "financeAwareness:logout" %}">Wyloguj</a>
-            {% else %}
-            <a href="{% url "financeAwareness:login" %}">Zaloguj</a>
+            <div class="container-fluid ">
+                <div class="row mb-3 g-4">
+                    <div class="col" >
+                        <div class="card text-center">
+                            <div class="card-header " >
+                                Dostępne środki
+                            </div>
+                            <div class="card-body" >
+                                {% available_funds request.user.id %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col">
+                        <div class="card text-center">
+                            <div class="card-header">
+                                Nadchodzące transakcje
+                            </div>
+                            <div class="card-body">
+                                {% available_funds request.user.id %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col">
+                        <div class="card text-center">
+                            <div class="card-header">
+                                Cel
+                            </div>
+                            <div class="card-body">
+                                {% active_goal request.user.id %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                   
             {% endif %}
-        </div>
-        <div id="main">
-            {% if request.user.is_authenticated %}
-            <div id="side">
-                <h1>Menu</h1>
-                <a href="{% url "financeAwareness:transactions" %}">Transakcje</a>
-                <a href="{% url "financeAwareness:new_transaction" %}">Dodaj transakcje</a>
-                <a href="{% url "financeAwareness:categories" %}">Kategorie</a>
-                <a href="{% url "financeAwareness:accounts" %}">Konta i cele</a>
-                <a href="">Raporty</a>
-                <a href="{% url "financeAwareness:recurrings" %}">Stałe transakcje</a>
-                <a href="">Profil</a>
-            </div>  
-            {% endif %}
-            <div id="content">
+
                 {% block content %}
                 {% endblock %}
-            </div>
+            </div> 
         </div>
-        <div id="footer">
-            <h1>Praca inżynierska</h1>
-        </div>  
+        <footer>
+            <div class="footer bg-success container" id="navbar">
+                <h1>Praca inżynierska</h1>
+                
+            </div>
+        </footer>
+         
     </body>
 </html>

@@ -1,21 +1,29 @@
 {% extends "base.html" %}
 
-{% block title %} Kategorie {% endblock %}
+{% block title %} {{category.name}} {% endblock %}
 
 {% block content %}
-<div class="transaction">
-{% for subcategory in subcategories %}
-    <div class="item">
-        <a href="{{subcategory.get_subcategory_url}}">{{subcategory.name}}</a>
-    </div>
-{% endfor %}
-<div class="item">
-    <a href="{{category.get_category_url}}">+</a>
-    </div>
-</div>
-<div class="item">
-    <a href="{% url "financeAwareness:category_form_update" category.id %}">Zmień</a>
-    <a href="{% url "financeAwareness:category_form_delete" category.id %}">Usuń</a>
-    </div>
-</div>
+    <div class="card text-center" >
+        <div class="card-header">
+            <h1>Kategoria {{category.name}}</h1>
+            <a class="btn btn-primary" href="{% url "financeAwareness:subcategory_form" category.id %}">Dodaj podkategorie</a>
+            <a class="btn btn-secondary" href="{% url "financeAwareness:category_form_update" category.id %}">Zmień</a>
+            <a class="btn btn-danger" href="{% url "financeAwareness:category_form_delete" category.id %}">Usuń</a>
+        </div>
+        <div class="row row-cols-2 mt-1 mb-1 g-4">
+            {% for subcategory in subcategories %}
+            <div class="col">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>{{subcategory.name}}</h1>
+                    </div> 
+                        <div class="card-body">
+                            <a class="btn btn-secondary" href="{% url "financeAwareness:subcategory_form_update" subcategory.id %}">Zmień</a>
+                            <a class="btn btn-danger" href="{% url "financeAwareness:subcategory_form_delete" subcategory.id %}">Usuń</a>
+                        </div>
+                </div>                     
+            </div>
+            {% endfor %}
+        </div>
+    </div>      
 {% endblock %}

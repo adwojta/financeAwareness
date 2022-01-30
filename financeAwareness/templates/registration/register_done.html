@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %} Utworzono konto {% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3>Utworzono konto</h3>
+    </div>
+    <div class="card-body">
+        Pomyślnie utworzono konto
+        <a class="btn btn-primary" href="{% url "financeAwareness:login" %}">Zaloguj</a>
+    </div>
+</div>
+{% endblock %}

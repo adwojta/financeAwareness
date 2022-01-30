@@ -1,34 +1,70 @@
 {% extends "base.html" %}
 
-{% block title %} Konta {% endblock %}
+{% block title %} Konta i cele {% endblock %}
 
 {% block content %}
-
-<div class="transaction">
-{% for account in accounts %}
-
-    <div class="item">
-    <p>{{account.name}}</p>
-    <p>{{account.value}}</p>
-    <a href="{% url "financeAwareness:account_form_update" account.id %}">+</a>
-    <a href="{% url "financeAwareness:account_form_delete" account.id %}">-</a>
+<div class="card text-center" >
+    <div class="card-header">
+        <h1>Konta i cele</h1>
+        <a class="btn btn-primary" href="{% url "financeAwareness:saving_goal_form" %}">Dodaj cel</a>
+        <a class="btn btn-primary" href="{% url "financeAwareness:transfer_form" %}">Dodaj transfer</a>
+        <a class="btn btn-primary" href="{% url "financeAwareness:new_account" %}">Dodaj konto</a>  
     </div>
-{% endfor %}
-<a href="{% url "financeAwareness:new_account" %}">+</a>
-</div>
+    <div class="row row-cols-2 mt-1 g-4">
 
-<div class="transaction">
-    {% for goal in goals %}
-    
-        <div class="item">
-        <p>{{goal.name}}</p>
-        <p>{{goal.value}}</p>
-        <p>{{goal.goal_value}}</p>
-        <a href="{% url "financeAwareness:saving_goal_form_update" goal.id %}">+</a>
-        <a href="{% url "financeAwareness:saving_goal_form_delete" goal.id %}">-</a>
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    <h1>Konta</h1>
+                    
+                </div>
+                <div class="row row-cols-2 mt-1 g-4">
+                    {% for account in accounts %}              
+                    <div class="col">
+                        <div class="card-body">                   
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3>{{account.name}}</h3>
+                                </div>
+                                <div class="card-body">
+                                    <p>{{account.value}}</p>
+                                    <a class="btn btn-secondary" href="{% url "financeAwareness:account_form_update" account.id %}">Edytuj</a>
+                                    <a class="btn btn-danger" href="{% url "financeAwareness:account_form_delete" account.id %}">Usuń</a>      
+                                </div>
+                            </div>
+                        </div>
+                    </div>                              
+                {% endfor %} 
+            </div>
+            </div>
         </div>
-    {% endfor %}
-    <a href="{% url "financeAwareness:saving_goal_form" %}">+</a>
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    <h1>Cele</h1>
+                </div>
+                <div class="row row-cols-2 mt-1 g-4">
+                {% for goal in goals %}
+                <div class="col">
+                    <div class="card-body">                  
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>{{goal.name}}</h3>
+                            </div>
+                            <div class="card-body">
+                                <p>{{goal.value}}</p>
+                                <p>{{goal.goal_value}}</p>
+                                <a class="btn btn-secondary" href="{% url "financeAwareness:saving_goal_form_update" goal.id %}">Edytuj</a>
+                                <a class="btn btn-danger" href="{% url "financeAwareness:saving_goal_form_delete" goal.id %}">Usuń</a>      
+                            </div>
+                        </div>                                    
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            </div>
+        </div>      
     </div>
-    <a href="{% url "financeAwareness:transfer_form" %}">+</a>
+</div>
+    
 {% endblock %}

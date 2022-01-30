@@ -30,22 +30,33 @@
             let div = document.getElementById(div_id)
             div.remove()
         }
+
     </script>
-<form action="#" method="post">
-    {{transaction_form.as_p}}
-    {% csrf_token %}
-    <div id='items'>
-    {% for transaction_item_form in transaction_item_forms %}
-    <div style="background-color: rgb(0, 123, 206);border-radius: 5px;" id='item_1' class = 'transaction_item'>
-        <input type="button" onclick="delete_item(this)" value="Usuń" style="display: none;">
-        {{transaction_item_form.as_p}}
+<div class="card">
+    <div class="card-header">
+        <h3>Dodaj transakcje</h3>
     </div>
+    <div class="card-body">
+        <form action="#" method="post">
     
 
-    {% endfor %}
+            {{transaction_form.as_p}}
+            {% csrf_token %}
+            <div id='items'>
+            {% for transaction_item_form in transaction_item_forms %}
+            <div style="background-color: rgb(0, 123, 206);border-radius: 5px;" id='item_1' class = 'transaction_item'>
+                <input class="btn btn-secondary" type="button" onclick="delete_item(this)" value="Usuń" style="display: none;">
+                {{transaction_item_form.as_p}}
+            </div>   
+        
+            {% endfor %}
+            </div>
+            <input class="btn btn-secondary" type="button" onclick="add_item()" value="Dodaj element">
+            <input class="btn btn-primary" type="submit" value="Dodaj">
+        </form>
+        </div>
     </div>
-    <input type="button" onclick="add_item()" value="Dodaj element">
-    <p><input type="submit" value="Dodaj"></p>
-</form>
 </div>
+
+
 {% endblock %}

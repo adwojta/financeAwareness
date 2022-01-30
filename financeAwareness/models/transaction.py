@@ -18,9 +18,6 @@ class Transaction(models.Model):
         db_table = 'transaction'
         ordering = ('-date',)
 
-    def get_url(self):
-        return reverse('financeAwareness:transaction_details',args=[self.id])
-
     def __str__(self):
         return self.name
 

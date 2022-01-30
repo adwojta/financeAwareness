@@ -2,7 +2,14 @@
 
 {% block title %} Wylogowano {% endblock %}
 {% block content %}
-<h1>Wylogowano</h1>
 
-<a href="{% url "financeAwareness:login" %}">Zaloguj ponownie</a>
+<div class="card">
+    <div class="card-header">
+        <h3>Wylogowano</h3>
+    </div>
+    <div class="card-body">
+        <a class="btn btn-primary" href="{% url "financeAwareness:login" %}">Zaloguj ponownie</a>
+        <a class="btn btn-primary" href="{% url "financeAwareness:index" %}">Powrót do strony głównej</a>
+    </div>
+</div>
 {% endblock %}

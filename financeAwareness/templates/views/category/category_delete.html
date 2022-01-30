@@ -1,14 +1,18 @@
 {% extends "base.html" %}
 
-{% block title %} Dodaj kategorie {% endblock %}
+{% block title %} Usuń kategorie {% endblock %}
 {% block content %}
-<div style="background-color: rgb(109, 255, 121);"></div>
-
-<form action="" method="post">
-    {% csrf_token %}
-    <p>Czy na pewno chcesz usunac kategorie?</p>
-    <p><input type="submit" value="Tak"></p>
-    <a href="{% url "financeAwareness:category_details" category_id %}">Nie</a>
-</form>
+<div class="card">
+    <div class="card-header">
+        <h3>Usuń kategorie</h3>
+    </div>
+    <div class="card-body">
+        <form action="" method="post">
+            {% csrf_token %}
+            <p>Czy na pewno chcesz usunac kategorie?</p>
+            <input class="btn btn-primary" type="submit" value="Tak">
+            <a class="btn btn-secondary" href="{% url "financeAwareness:category_details" category_id %}">Nie</a>
+        </form>
+    </div>
 </div>
 {% endblock %}

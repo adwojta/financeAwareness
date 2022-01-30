@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %} financeAwareness {% endblock %}
+{% block content %}
+
+<div class="card">
+    <div class="card-header">
+        <h3>Praca inzynierska</h3>
+    </div>
+    <div class="card-body">
+        <a class="btn btn-primary" href="{% url "financeAwareness:login" %}">Zaloguj</a>
+        <a class="btn btn-primary" href="{% url "financeAwareness:register" %}">Zarejestruj się</a>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,14 +1,18 @@
 {% extends "base.html" %}
 
-{% block title %} Dodaj kategorie {% endblock %}
+{% block title %} Zakutalizuj konto {% endblock %}
 {% block content %}
-<div style="background-color: rgb(109, 255, 121);"></div>
-
-<form action="" method="post">
-    {{account_form.as_p}}
-    {% csrf_token %}
-    <p><input type="submit" value="Zakutalizuj"></p>
-    <a href="{% url "financeAwareness:accounts" %}">Wróć</a>
-</form>
+<div class="card">
+    <div class="card-header">
+        <h3>Zakutalizuj konto</h3>
+    </div>
+    <div class="card-body">
+        <form action="" method="post">
+            {{account_form.as_p}}
+            {% csrf_token %}
+            <input class="btn btn-primary" type="submit" value="Zakutalizuj">
+            <a class="btn btn-secondary" href="{% url "financeAwareness:accounts" %}">Wróć</a>
+        </form>
+    </div>
 </div>
 {% endblock %}

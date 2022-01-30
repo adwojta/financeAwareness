@@ -1,14 +1,19 @@
 {% extends "base.html" %}
 
-{% block title %} Dodaj kategorie {% endblock %}
+{% block title %} Dodaj konto {% endblock %}
 {% block content %}
-<div style="background-color: rgb(109, 255, 121);"></div>
-
-<form action="" method="post">
-    {{account_form.as_p}}
-    {% csrf_token %}
-    <p><input type="submit" value="Dodaj"></p>
-</form>
-
+<div class="card">
+    <div class="card-header">
+        <h3>Dodaj konto</h3>
+    </div>
+    <div class="card-body">
+        <form action="" method="post">
+            {{account_form.as_p}}
+            {% csrf_token %}
+            <p><input class="btn btn-primary" type="submit" value="Dodaj"></p>
+        </form>       
+    </div>
 </div>
+
+
 {% endblock %}

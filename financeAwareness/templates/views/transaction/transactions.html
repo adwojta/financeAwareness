@@ -1,28 +1,54 @@
 {% extends "base.html" %}
-
+{% load humanize %}
 {% block title %} Transakcje {% endblock %}
 
 {% block content %}
-
-<div class="transaction">
+<div class="card text-center" >
+    <div class="card-header">
+        <h1>Transakcje</h1>
+        <a class="btn btn-primary" href="{% url "financeAwareness:new_transaction" %}">Dodaj transakcje</a>
+    </div>
+<div class="row row-cols-2 row-cols-md-4 g-4">
 {% for transaction in transactions %}
 
-    <div class="item">
-    <a href="{{transaction.get_url}}">{{transaction.name}}</a>
-    <p>{{transaction.value}}</p>
-    <p>{{transaction.date | date}}</p>
+    <div class="col">
+        {% if transaction.is_income %}
+        <div class="card text-center" id="income">
+        {% else %}
+        <div class="card text-center" id="expense">
+        {% endif %}
+            <div class="card-header">
+                <h3><a class="btn btn-outline-dark" id="details" href="{% url "financeAwareness:transaction_details" transaction.id %}">{{transaction.date | naturalday}}</a></h3>
+            </div>
+            <div class="card-body">
+                <p>{{transaction.name}}</p>
+                <p>{{transaction.value}}</p>
+                <a class="btn btn-secondary" href="">Edycja</a>
+                <a class="btn btn-danger" href="">Usuń</a>                 
+            </div>
+        </div>
     </div>
+    
+    
 {% endfor %}
+
 {% for transfer in transfers %}
 
-    <div class="item">
-    <p>{{transfer.value}}</p>
-    <p>{{transfer.from_account}}</p>
-    <p>{{transfer.to_account}}</p>
-    <p>{{transfer.date | date}}</p>
-    <a href="{% url "financeAwareness:transfer_form_update" transfer.id %}">+</a>
-    <a href="{% url "financeAwareness:transfer_form_delete" transfer.id %}">-</a>
+    <div class="col">
+        <div class="card text-center" id="transfer">
+            <div class="card-header">
+                <h3>{{transfer.from_account}} --> {{transfer.to_account}}</h3>
+            </div>
+            <div class="card-body">
+                <p>{{transfer.date | date}}</p>
+                <p>{{transfer.value}}</p>
+                <a class="btn btn-secondary" href="{% url "financeAwareness:transfer_form_update" transfer.id %}">Edycja</a>
+                <a class="btn btn-danger" href="{% url "financeAwareness:transfer_form_delete" transfer.id %}">Usuń</a>                
+            </div>
+        </div>
     </div>
+
 {% endfor %}
+</div>
 </div>
 {% endblock %}

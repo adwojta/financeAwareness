@@ -1,0 +1,13 @@
+
+{% if remaining %}
+
+<h4>{{goal.name}}</h4>
+<p>Cel: {{goal.goal_value}}</p>
+<p>Oszczędzono: {{goal.value}}</p>
+<p>Oszczędzaj miesięcznie: {{remaining}} by osiągnąć cel!</p>
+
+{%else%}
+
+<p>Brak aktywnego celu</p>
+
+{%endif%}

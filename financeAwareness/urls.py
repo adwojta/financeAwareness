@@ -5,11 +5,20 @@ from . import views
 app_name = 'financeAwareness'
 
 urlpatterns = [
+    #Main
+    path('',views.index,name='index'),
+    
+
+
+    #registration
     path('login/',auth_views.LoginView.as_view(),name='login'),
     path('logout/',auth_views.LogoutView.as_view(),name='logout'),
-    path('',views.transaction_list,name='transactions'),
+    path('register/',views.register,name='register'),
+    path('password_change/',auth_views.PasswordChangeView.as_view(),name='password_change'),
+    path('password_change/done/',auth_views.PasswordChangeDoneView.as_view(),name='password_change_done'),
 
     #transaction
+    path('dashboard',views.transaction_list,name='transactions'),
     path('transaction/<int:transaction_id>',views.transaction_details,name='transaction_details'),
     path('transaction/new',views.transaction_form,name='new_transaction'),
     path('transaction/recurring',views.recurring_list,name='recurrings'),
@@ -24,7 +33,6 @@ urlpatterns = [
 
     #subcategory
     path('subcategories/new/<int:master_category>',views.subcategory_form,name='subcategory_form'),
-    path('subcategories/<int:subcategory_id>',views.subcategory_details,name='subcategory_details'),
     path('subcategories/update/<int:subcategory_id>',views.subcategory_form_update,name='subcategory_form_update'),
     path('subcategories/delete/<int:subcategory_id>',views.subcategory_form_delete,name='subcategory_form_delete'),
 

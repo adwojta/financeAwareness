@@ -11,14 +11,5 @@ class Category(models.Model):
     class Meta:
         db_table = 'category'
 
-    def get_details_url(self):
-        return reverse('financeAwareness:category_details',args=[self.id])
-
-    def get_category_url(self):
-        return reverse('financeAwareness:subcategory_form',args=[self.id])
-
-    def get_subcategory_url(self):
-        return reverse('financeAwareness:subcategory_details',args=[self.id])
-
     def __str__(self):
         return self.name

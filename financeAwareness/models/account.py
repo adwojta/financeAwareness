@@ -6,7 +6,9 @@ class Account(models.Model):
     user_id = models.ForeignKey(User,on_delete=models.CASCADE,related_name="accounts")
     value = models.FloatField(default=0)
     is_cash = models.BooleanField()
-    is_saving_goal = models.BooleanField(null=True,blank=True)
+    is_saving_goal = models.BooleanField(null=True,blank=True,default=False)
+    is_active_saving_goal = models.BooleanField(default=False)
+    
     due_date = models.DateField(null=True,blank=True)
     accomplished_date = models.DateField(null=True,blank=True)
     goal_value = models.FloatField(null=True,blank=True)

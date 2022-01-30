@@ -3,28 +3,55 @@
 {% block title %} Kategorie {% endblock %}
 
 {% block content %}
-<div class="transaction">
-<p>Wydatki</p>
-{% for expense in expenses %}
-    <div class="item">
-    <a href="{{expense.get_details_url}}">{{expense.name}}</a>
+<div class="card text-center" >
+    <div class="card-header">
+        <h1>Kategorie</h1>
     </div>
-{% endfor %}
-<div class="item">
-    <a href="{% url "financeAwareness:new_category" %}">+</a>
+    <div class="row row-cols-2 mt-1 g-4">
+
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    <h1>Wydatki</h1>
+                    <a class="btn btn-primary" href="{% url "financeAwareness:new_category" %}">Dodaj</a>  
+                </div>
+                <div class="row row-cols-2 mt-1 g-4">
+                {% for expense in expenses %}               
+                    <div class="col">
+                        <div class="card-body">                   
+                            <div class="card">
+                                <div class="card-body">
+                                    <a class="btn btn-outline-dark btn-lg" href="{% url "financeAwareness:category_details" expense.id %}">{{expense.name}}</a>      
+                                </div>
+                            </div>
+                        </div>
+                    </div>                              
+                {% endfor %} 
+            </div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    <h1>Przychody</h1>
+                    <a class="btn btn-primary" href="{% url "financeAwareness:new_category" "income" %}">Dodaj</a>  
+                </div>
+                <div class="row row-cols-2 mt-1 g-4">
+                {% for income in incomes %}
+                <div class="col">
+                    <div class="card-body">                  
+                        <div class="card">
+                            <div class="card-body">
+                                <h3><a class="btn btn-outline-dark btn-lg" href="{% url "financeAwareness:category_details" income.id %}">{{income.name}}</a></h3>      
+                            </div>
+                        </div>                                    
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            </div>
+        </div>      
     </div>
 </div>
-
-<div class="transaction">
-    <p>Przychody</p>
-    {% for income in incomes %}
-        <div class="item">
-        <a href="{{income.get_details_url}}">{{income.name}}</a>
-        </div>
-    {% endfor %}
-    <div class="item">
-        <a href="{% url "financeAwareness:new_category" "income" %}">+</a>
-        </div>
-</div>
-
 {% endblock %}
