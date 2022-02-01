@@ -2,17 +2,17 @@
 
 {% block title %} Dodaj Transakcje {% endblock %}
 {% block content %}
-<div style="background-color: rgb(216, 255, 109);">
     <script>
         function change_transaction_value(){
             let items = document.getElementsByName("item_value")
             let transaction_value = document.getElementsByName("value")
             let sum = 0
             for(var i=0;i < items.length;i++ ){
-                sum += parseInt(items[i].value)
+                sum += parseFloat(items[i].value)
             }
             transaction_value[0].value = sum
         }
+
         function add_item(){
             let elem = document.getElementById('item_1');
             let id = document.getElementsByClassName('transaction_item');
@@ -23,40 +23,88 @@
             document.getElementById('items').appendChild(clone_div)
 
             elem = document.getElementById(new_div_id);
-            elem.children[0].style.display=""
+            elem.children[0].children[0].style.display=""
+
+            subcategory = $(elem).find('Select[name="subcategory"]')
+            subcategory.empty()
+            subcategory.append($('<option>').val(0).text('brak'))
         }
+
         function delete_item(element){
-            let div_id = element.parentNode.id
+            let div_id = element.parentNode.parentNode.id
             let div = document.getElementById(div_id)
             div.remove()
         }
 
+        $( function() {
+        $( "#id_date" ).datepicker({
+        showWeek: true,
+        dateFormat: 'yy-mm-dd',
+        regional: 'pl',
+        firstDay: 1
+        });
+    } );
+
+        function getSubcategories(element){
+            var category = $(element).val()
+            $.ajax({
+                type:'get',
+                url:"{% url 'financeAwareness:ajaxSubcategories' %}",
+                data:{'category':category},
+                success: function(response,status,jqXHR){
+                    if(jqXHR.status=="200"){
+                        console.log($(element).nextAll('select').first())
+                        console.log(element)
+                        $(element).nextAll('select').first().empty()                                  
+                    data = JSON.parse(response['subcategories'])                 
+                    $.each(data, function(i, item){
+                        var optionText = item['fields']['name']
+                        var optionValue = item['pk']
+                        $(element).nextAll('select').first().append($('<option>').val(optionValue).text(optionText))
+                        }                                               
+                    ) 
+                    }else{
+                        $(element).nextAll('select').first().empty() 
+                        $(element).nextAll('select').first().append($('<option>').val(-1).text("brak"))
+                    }    
+                                      
+                }
+            })
+        }
+
+
+    
     </script>
 <div class="card">
     <div class="card-header">
         <h3>Dodaj transakcje</h3>
     </div>
     <div class="card-body">
-        <form action="#" method="post">
-    
-
+        <form action="#" method="post">   
             {{transaction_form.as_p}}
             {% csrf_token %}
             <div id='items'>
             {% for transaction_item_form in transaction_item_forms %}
-            <div style="background-color: rgb(0, 123, 206);border-radius: 5px;" id='item_1' class = 'transaction_item'>
-                <input class="btn btn-secondary" type="button" onclick="delete_item(this)" value="Usuń" style="display: none;">
-                {{transaction_item_form.as_p}}
-            </div>   
-        
+            <div style="background-color: rgb(188, 210, 224);border-radius: 5px; margin-bottom: 1em;" id='item_1' class = 'transaction_item'>
+                <p><input class="btn btn-secondary" type="button" onclick="delete_item(this)" value="Usuń element" style="display: none;"></p>
+                {{transaction_item_form.item_name.label_tag}}
+                {{transaction_item_form.item_name}}
+                {{transaction_item_form.category_id.label_tag}}  
+                {{transaction_item_form.category_id}}
+                {{transaction_item_form.subcategory.label_tag}}
+                {{transaction_item_form.subcategory}}
+                {{transaction_item_form.item_value.label_tag}}
+                {{transaction_item_form.item_value}}
+                {{transaction_item_form.is_planned.label_tag}}
+                {{transaction_item_form.is_planned}}
+                {{transaction_item_form.tags.label_tag}}
+                {{transaction_item_form.tags}}
+            </div>          
             {% endfor %}
             </div>
             <input class="btn btn-secondary" type="button" onclick="add_item()" value="Dodaj element">
-            <input class="btn btn-primary" type="submit" value="Dodaj">
+            <input class="btn btn-primary" type="submit" value="Dodaj transakcje">
         </form>
         </div>
     </div>
-</div>
-
-
 {% endblock %}

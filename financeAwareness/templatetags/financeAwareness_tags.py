@@ -12,6 +12,16 @@ def available_funds(user):
     sum = Account.objects.filter(user_id=user).aggregate(Sum('value'))
     return sum['value__sum']
 
+@register.simple_tag
+def available_funds_cash(user):
+    sum = Account.objects.filter(user_id=user,is_cash=True).aggregate(Sum('value'))
+    return sum['value__sum']
+
+@register.simple_tag
+def available_funds_bank(user):
+    sum = Account.objects.filter(user_id=user,is_cash=False).aggregate(Sum('value'))
+    return sum['value__sum']
+
 @register.inclusion_tag('views/account/saving_goal_active.html')
 def active_goal(user):
     try:

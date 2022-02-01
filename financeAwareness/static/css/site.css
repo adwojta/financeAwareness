@@ -7,11 +7,11 @@
 }
 
 #transfer{
-    background-color: yellow; 
+    background-color: rgba(241, 241, 107, 0.774); 
 }
 #income{
-    background-color: rgb(115, 255, 102);
+    background-color: rgba(115, 255, 102, 0.596);
 }
 #expense{
-    background-color: rgb(240, 105, 105);
+    background-color: rgba(240, 105, 105, 0.644);
 }

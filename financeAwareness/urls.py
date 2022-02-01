@@ -20,8 +20,12 @@ urlpatterns = [
     #transaction
     path('dashboard',views.transaction_list,name='transactions'),
     path('transaction/<int:transaction_id>',views.transaction_details,name='transaction_details'),
-    path('transaction/new',views.transaction_form,name='new_transaction'),
+    path('transaction/expense/new',views.expense_form,name='new_expense'),
+    path('transaction/income/new',views.income_form,name='new_income'),
+    path('transaction/<int:transaction_id>/update/',views.transaction_form_update,name='transaction_form_update'),
+    path('transaction/<int:transaction_id>/delete/',views.transaction_form_delete,name='transaction_form_delete'),
     path('transaction/recurring',views.recurring_list,name='recurrings'),
+    path('transaction/ajax/subcategories',views.getSubcategories,name='ajaxSubcategories'),
 
     #category
     path('categories',views.category_list,name='categories'),

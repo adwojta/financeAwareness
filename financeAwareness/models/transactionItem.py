@@ -1,6 +1,7 @@
 from django.db import models
 from financeAwareness.models.category import Category
 
+
 from financeAwareness.models.transaction import Transaction
 
 class TransactionItem(models.Model):
