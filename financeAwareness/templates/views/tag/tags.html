@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %} Tagi {% endblock %}
+
+{% block content %}
+<div class="card text-center" >
+    <div class="card-header">
+        <h1>Tagi</h1>
+        <a class="btn btn-primary" href="{% url "financeAwareness:new_tag" %}">Dodaj</a>
+    </div>
+    <div class="card-body">
+        {% for tag in tags %}
+        
+        <div class="card">
+            <div class="card-header">
+                {{tag.name}}
+            </div>
+            <div class="card-body">
+                <a class="btn btn-secondary" href="{% url "financeAwareness:tag_form_update" tag.id %}">Zmiań</a>
+                <a class="btn btn-danger" href="{% url "financeAwareness:tag_form_delete" tag.id %}">Usuń</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

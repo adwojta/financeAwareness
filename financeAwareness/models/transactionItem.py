@@ -9,7 +9,7 @@ class TransactionItem(models.Model):
     transaction_id = models.ForeignKey(Transaction,on_delete=models.CASCADE, related_name="items")
     category_id = models.ForeignKey(Category,on_delete=models.SET_NULL, related_name="items", null=True)
     item_value = models.FloatField()
-    is_planned = models.BooleanField()
+    is_planned = models.BooleanField(default=True,blank=True)
 
     class Meta:
         db_table = 'transactionItem'

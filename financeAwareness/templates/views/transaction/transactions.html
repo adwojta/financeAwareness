@@ -3,43 +3,64 @@
 {% block title %} Transakcje {% endblock %}
 
 {% block content %}
-<div class="card text-center" >
+<div class="card text-center mb-1" >
     <div class="card-header">
         <h1>Transakcje</h1>
         <a class="btn btn-primary" href="{% url "financeAwareness:new_expense" %}">Dodaj wydatek</a>
         <a class="btn btn-primary" href="{% url "financeAwareness:new_income" %}">Dodaj przychód</a>
         <a class="btn btn-primary" href="{% url "financeAwareness:transfer_form" %}">Dodaj transfer</a>
     </div>
-
-    <div class="row row-cols-2 row-cols-md-4 g-4">
-    {% for transaction in transactions %}
-        <div class="col">
-            {% if transaction.type == "income" %}
-            <div class="card text-center" id="income">
-            {% elif transaction.type == "expense" %}
-            <div class="card text-center" id="expense">
-            {% else %}
-            <div class="card text-center" id="transfer">
-            {% endif %}
-                <div class="card-header">
-                    {% if transaction.type == "transfer" %}
-                    <p>{{transaction.name}}</p>
+    <div class="card-body">
+        <div class="row row-cols-2 row-cols-md-4 g-4">
+            {% for transaction in transactions %}
+                <div class="col">
+                    {% if transaction.type == "income" %}
+                    <div class="card text-center" id="income">
+                    {% elif transaction.type == "expense" %}
+                    <div class="card text-center" id="expense">
                     {% else %}
-                    <p><a class="btn btn-outline-dark" id="details" href="{% url "financeAwareness:transaction_details" transaction.id %}">{{transaction.name}}</a></p>
+                    <div class="card text-center" id="transfer">
                     {% endif %}
-                </div>
-                <div class="card-body">
-                    <p>Data: {{transaction.date | naturalday}}</p>
-                    <p>Wartość: {{transaction.value}}</p>
-                    {% if transaction.type == "transfer" %}
-                    <a class="btn btn-secondary" href="{% url "financeAwareness:transfer_form_update" transaction.id %}">Edycja</a>
-                    <a class="btn btn-danger" href="{% url "financeAwareness:transfer_form_delete" transaction.id %}">Usuń</a>  
-                    {% endif %}
-                </div>
+                        <div class="card-header">
+                            {% if transaction.type == "transfer" %}
+                            <p>{{transaction.name}}</p>
+                            {% else %}
+                            <p><a class="btn btn-outline-dark" id="details" href="{% url "financeAwareness:transaction_details" transaction.id %}">{{transaction.name}}</a></p>
+                            {% endif %}
+                        </div>
+                        <div class="card-body">
+                            <p>Data: {{transaction.date | naturalday}}</p>
+                            <p>Wartość: {{transaction.value}}</p>
+                            {% if transaction.type == "transfer" %}
+                            <a class="btn btn-secondary" href="{% url "financeAwareness:transfer_form_update" transaction.id %}">Edycja</a>
+                            <a class="btn btn-danger" href="{% url "financeAwareness:transfer_form_delete" transaction.id %}">Usuń</a>  
+                            {% endif %}
+                        </div>
+                    </div>
+                </div> 
+            {% endfor %}
             </div>
-        </div> 
-    {% endfor %}
-
+    </div>  
+    <div class="card-footer">
+        <nav aria-label="pagination">
+            <ul class="pagination justify-content-center">
+            
+            {% if page_number.has_previous %}
+                <li class="page-item">
+                <a class="page-link" href="?page={{page_number.previous_page_number}}">Poprzednia strona</a>
+                </li>
+            {% endif %}
+                <li class="page-item">
+                    <a class="page-link" href="#">{{page_number.number}}</a>
+                </li>
+            {% if page_number.has_next %}
+                <li class="page-item">
+                <a class="page-link" href="?page={{page_number.next_page_number}}">Następna strona</a>
+                </li>
+            {% endif %}
+            </ul>       
+        </nav>  
     </div>
 </div>
+
 {% endblock %}

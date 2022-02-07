@@ -9,6 +9,7 @@
         <p>{{transaction.name}}</p>
         <p>Data: {{transaction.date}}</p>
         <p>Wartość: {{transaction.value}}</p>
+        <a class="btn btn-primary" href="{% url "financeAwareness:transactions" %}">Powrót</a>
         <a class="btn btn-secondary" href="{% url "financeAwareness:transaction_form_update" transaction.id %}">Edycja</a>
         <a class="btn btn-danger" href="{% url "financeAwareness:transaction_form_delete" transaction.id %}">Usuń</a>         
     </div>

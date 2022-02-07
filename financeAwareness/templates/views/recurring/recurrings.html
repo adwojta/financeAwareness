@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %} Stałe transakcje {% endblock %}
+
+{% block content %}
+<div class="card text-center" >
+    <div class="card-header">
+        <h1>Stałe transakcje</h1>
+        <a class="btn btn-primary" href="{% url "financeAwareness:new_reccuring_expense" %}">Dodaj stały wydatek</a>
+        <a class="btn btn-primary" href="{% url "financeAwareness:new_reccuring_income" %}">Dodaj stały przychód</a>
+    </div>
+
+    <div class="row row-cols-2 row-cols-md-4 g-4">
+    {% for transaction in transactions %}
+        <div class="col">
+            {% if transaction.type == "recurringIncome" %}
+            <div class="card text-center" id="income">
+            {% else %}
+            <div class="card text-center" id="expense">
+            {% endif %}
+                <div class="card-header">
+                    <p><a class="btn btn-outline-dark" id="details" href="{% url "financeAwareness:recurring_details" transaction.id %}">{{transaction.name}}</a></p>
+                </div>
+                <div class="card-body">
+                    <p>Kolejna transakcja: {{transaction.date | naturalday}}</p>
+                    <p>Wartość: {{transaction.value}}</p>
+                    <a class="btn btn-secondary" href="{% url "financeAwareness:recurring_form_add" transaction.id %}">Dokonaj transakcji</a>
+                </div>
+            </div>
+        </div> 
+    {% endfor %}
+    </div>
+</div>
+{% endblock %}

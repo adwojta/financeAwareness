@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %} Dodaj tag {% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3>Dodaj tag</h3>
+    </div>
+    <div class="card-body">
+        <form action="" method="post">
+            {{tag_form.as_p}}
+            {% csrf_token %}
+            <input class="btn btn-primary" type="submit" value="Dodaj">
+        </form>
+    </div>
+</div>
+{% endblock %}

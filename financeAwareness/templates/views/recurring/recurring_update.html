@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %} Zaktualizuj Transakcje {% endblock %}
+{% block title %} Zaktualizuj stałą transakcje {% endblock %}
 {% block content %}
 <script>       
     $( function() {
@@ -15,7 +15,7 @@
 </script>
 <div class="card">
     <div class="card-header">
-        <h3>Zaktualizuj transakcje</h3>
+        <h3>Zaktualizuj stałą transakcje</h3>
     </div>
     <div class="card-body">
         <form action="#" method="post">   
@@ -33,13 +33,11 @@
                 {{transaction_item_form.subcategory}}
                 {{transaction_item_form.item_value.label_tag}}
                 {{transaction_item_form.item_value}}
-                {{transaction_item_form.is_planned.label_tag}}
-                {{transaction_item_form.is_planned}}
             </div>          
             {% endfor %}
             </div>
             <input class="btn btn-secondary" type="button" onclick="add_item()" value="Dodaj element">
-            <input class="btn btn-primary" type="submit" value="Zaktualizuj transakcje">
+            <input class="btn btn-primary" type="submit" value="Zaktualizuj stałą transakcje">
         </form>
         </div>
     </div>

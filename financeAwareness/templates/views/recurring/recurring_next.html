@@ -1,0 +1,14 @@
+
+{% if exists %}
+
+{% for recurring in recurrings %}
+
+<p>{{recurring.name}},{% if recurring.type == 'recurringExpense' %} wydatek {%else%} przychód{%endif%}, {{recurring.value}}, {{recurring.date}} </p>
+
+{% endfor %}
+
+{%else%}
+
+<p>Brak stałych transakcji </p>
+
+{%endif%}
