@@ -32,6 +32,7 @@ class TransactionForm(forms.ModelForm):
         self.fields["date"] = forms.DateField(widget=forms.DateInput())
         self.fields['value'] = forms.FloatField(widget=forms.NumberInput(),initial=0)
         self.fields["tags"] = forms.ModelMultipleChoiceField(queryset=Tag.objects.filter(user_id=User) ,widget=forms.CheckboxSelectMultiple)
+        self.fields["image"] = forms.ImageField(widget=forms.FileInput)
 
         #Labals
         self.fields["name"].label = "Nazwa transakcji"
@@ -39,19 +40,22 @@ class TransactionForm(forms.ModelForm):
         self.fields["value"].label = "Wartość"
         self.fields["description"].label = "Opis"
         self.fields["date"].label = "Data transakcji"
+        self.fields["image"].label = "Zdjęcie"
 
         self.fields["name"].widget.attrs.update({'class': 'form-control',}) 
         self.fields["account_id"].widget.attrs.update({'class': 'form-control',}) 
         self.fields["value"].widget.attrs.update({'class': 'form-control',}) 
         self.fields["description"].widget.attrs.update({'class': 'form-control',}) 
-        self.fields["date"].widget.attrs.update({'class': 'form-control',})   
-        self.fields["tags"].required=False   
+        self.fields["date"].widget.attrs.update({'class': 'form-control',})
+        self.fields["image"].widget.attrs.update({'class': 'form-control',})    
+        self.fields["tags"].required=False
+        self.fields["image"].required=False
 
         self.fields['value'].widget.attrs['readonly'] = True
 
     class Meta:
         model = Transaction
-        fields = ('name','account_id','value','description','date','tags')
+        fields = ('name','account_id','value','description','date','tags','image')
         
 class RecurringForm(forms.ModelForm):
     def __init__(self,User, *args, **kwargs):

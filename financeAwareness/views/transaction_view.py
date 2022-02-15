@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
 import datetime
+import os
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -100,8 +102,8 @@ class AbstractCreateTransaction(LoginRequiredMixin,CreateView,AbstractTransactio
                 data={'item_name':self.item_names[item],'category_id':self.item_categories[item],"item_value":self.item_values[item],"is_planned":self.items_planned[item]}
                 self.items_data.append(TransactionItemForm(User=request.user,data=data,type=self.category_type))
 
-    def post(self, request,is_planned=False, *args, **kwargs):
-        self.transaction_form = self.form(data=request.POST,User=request.user)
+    def post(self, request,is_planned=False, *args, **kwargs):    
+        self.transaction_form = self.form(data=request.POST,files=request.FILES,User=request.user)
         self.get_items_data(request)
         self.set_items_data_form(request,is_planned)
         self.transaction_item_forms = self.items_data
@@ -130,7 +132,8 @@ class AbstractCreateTransaction(LoginRequiredMixin,CreateView,AbstractTransactio
 class AbstractUpdateTransaction(LoginRequiredMixin,UpdateView,AbstractTransaction,ABC):
     transactionItems = None
     items_to_delete = []
-    
+    path =None
+
     def set_items_data_form(self, request,is_planned=False, *args, **kwargs):
         if self.items_amount < len(self.transactionItems):
             self.items_to_delete = self.transactionItems[self.items_amount:]
@@ -154,9 +157,15 @@ class AbstractUpdateTransaction(LoginRequiredMixin,UpdateView,AbstractTransactio
                     self.items_data.append(TransactionItemForm(User=request.user,data=data,instance=self.transactionItems[item],type=self.category_type))     
 
     def form_valid(self, request, *args, **kwargs):
+        print(request.POST)
         if self.transaction_form.is_valid():
+            new_image= bool(request.FILES)
+            if request.POST.__contains__('image-clear'):
+                self.transaction.image.delete()
+            if new_image and self.path !=None:
+                os.unlink(self.path)
+            
             self.new_transaction = self.transaction_form.save(commit=False)
-
             for item in self.items_data:
                 if not item.is_valid():
                     self.items_valid= False
@@ -172,6 +181,8 @@ class AbstractUpdateTransaction(LoginRequiredMixin,UpdateView,AbstractTransactio
 
     def setup(self, request, *args, **kwargs):
         self.transaction = get_object_or_404(Transaction,id=kwargs['transaction_id'])
+        if self.transaction.image:
+            self.path = self.transaction.image.path
         self.transaction_form = self.form(User=request.user,instance=self.transaction)
         self.transactionItems = self.transaction.items.all()
         self.old_value = self.transaction.value
@@ -201,7 +212,7 @@ class AbstractUpdateTransaction(LoginRequiredMixin,UpdateView,AbstractTransactio
         self.get_items_data(request)
         self.set_items_data_form(request,is_planned)
 
-        self.transaction_form = self.form(data=request.POST,User=request.user,instance=self.transaction)
+        self.transaction_form = self.form(data=request.POST,files=request.FILES,User=request.user,instance=self.transaction)
         self.transaction_item_forms = self.items_data
 
         self.form_valid(request)
