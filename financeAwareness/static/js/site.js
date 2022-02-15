@@ -26,9 +26,7 @@ function add_item(){
 }
 
 function delete_item(element){
-    let div_id = element.parentNode.parentNode.id
-    let div = document.getElementById(div_id)
-    div.remove()
+    $(element).parent().parent().remove()
     change_transaction_value()
 }
 
@@ -53,8 +51,7 @@ function getSubcategories(element){
             }else{
                 $(element).nextAll('select').first().empty() 
                 $(element).nextAll('select').first().append($('<option>').val(-1).text("brak"))
-            }    
-                              
+            }                       
         }
     })
 }

@@ -24,6 +24,8 @@ urlpatterns = [
     path('transaction/<int:transaction_id>/update/',views.TransactionUpdate.as_view(),name='transaction_form_update'),
     path('transaction/<int:transaction_id>/delete/',views.TransactionDelete.as_view(),name='transaction_form_delete'),
     path('transaction/ajax/subcategories',views.getSubcategories,name='ajaxSubcategories'),
+    path('transaction/ajax/categories',views.getCategories,name='ajaxCategories'),
+    path('transaction/search',views.search_transactions,name='search_transactions'),
 
     #planned
     path('transaction/planned',views.PlannedListView.as_view(),name='planned'),
@@ -79,5 +81,10 @@ urlpatterns = [
     path('savings/delete/<int:account_id>',views.saving_goal_form_delete,name='saving_goal_form_delete'),
 
     #reports
-    
+    path('reports/',views.reports_list,name='reports_list'),
+    path('reports/category',views.category_details,name='category_details'),
+    path('reports/tags',views.tags_details,name='tags_details'),
+    path('reports/planned',views.planned_details,name='planned_details'),
+    path('reports/recurring',views.recurring_details,name='recurring_details'),
+    path('reports/details',views.expense_income_details,name='expense_income_details'),
 ]

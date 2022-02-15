@@ -1,0 +1,244 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %} Transakcje {% endblock %}
+
+{% block content %}
+
+<script>
+    $(document).ready(function(){
+    const ctx = document.getElementById('expense_income_chart').getContext('2d');
+    const chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: [{%for label in labels%}'{{label}}',{% endfor %}],
+            datasets: [{
+                label: 'Suma',
+                data: [{%for data in data_exp_in %} {{data}} ,{% endfor %}],
+                backgroundColor: [
+                        'rgba(240, 105, 105, 0.644)',
+                        'rgba(115, 255, 102, 0.596)' 
+                        
+  
+                    ],
+                borderColor: [
+                    'rgba(240, 105, 105, 0.644)',
+                    'rgba(115, 255, 102, 0.596)' 
+                ],
+            }],
+             
+        },options:{
+            indexAxis: 'y',
+            plugins:{
+                title:{
+                    display:true,
+                    text: 'Suma wydatków i przychodów'
+                }
+            }
+        }
+
+        });
+    })
+
+    $(document).ready(function(){
+    const ctx = document.getElementById('recurring_expense_income_chart').getContext('2d');
+    const chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: [{%for label in labels_r%}'{{label}}',{% endfor %}],
+            datasets: [{
+                label: 'Suma',
+                data: [{%for data in data_r_exp_in %} {{data}} ,{% endfor %}],
+                backgroundColor: [
+                        'rgba(240, 105, 105, 0.644)',
+                        'rgba(115, 255, 102, 0.596)' 
+                        
+  
+                    ],
+                borderColor: [
+                    'rgba(240, 105, 105, 0.644)',
+                    'rgba(115, 255, 102, 0.596)' 
+                ],
+            }],
+             
+        },options:{
+            indexAxis: 'y',
+            plugins:{
+                title:{
+                    display:true,
+                    text: 'Suma stałych wydatków i przychodów'
+                }
+            }
+        }
+
+        });
+    }) 
+
+    $(document).ready(function(){
+    const ctx = document.getElementById('category_expense_chart').getContext('2d');
+    const chart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: [{%for label in labels_c_e %}'{{label}}',{% endfor %}],
+            datasets: [{
+                label: 'Suma',
+                data: [{%for data in data_c_e %} {{data}} ,{% endfor %}],
+                backgroundColor: [
+                        'rgba(240, 105, 105, 0.644)',
+                        'rgba(115, 255, 102, 0.596)' 
+                        
+  
+                    ],
+                borderColor: [
+                    'rgba(240, 105, 105, 0.644)',
+                    'rgba(115, 255, 102, 0.596)' 
+                ],
+            }],
+             
+        },options:{
+            indexAxis: 'y',
+            plugins:{
+                title:{
+                    display:true,
+                    text: 'Wydatki wg. kategorii'
+                }
+            }
+        }
+
+        });
+    })
+
+    $(document).ready(function(){
+    const ctx = document.getElementById('planned_chart').getContext('2d');
+    const chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: [{%for label in labels_planned %}'{{label}}',{% endfor %}],
+            datasets: [{
+                label: 'Suma',
+                data: [{%for data in data_planned %} {{data}} ,{% endfor %}],
+                backgroundColor: [
+                        'rgba(115, 255, 102, 0.596)',
+                        'rgba(240, 105, 105, 0.644)'
+                        
+  
+                    ],
+                borderColor: [
+                    'rgba(115, 255, 102, 0.596)',
+                    'rgba(240, 105, 105, 0.644)' 
+                ],
+            }],
+             
+        },options:{
+            indexAxis: 'y',
+            plugins:{
+                title:{
+                    display:true,
+                    text: 'Suma planowanych wydatków i przychodów'
+                }
+            }
+        }
+
+        });
+    }) 
+
+    $(document).ready(function(){
+    const ctx = document.getElementById('tags_chart').getContext('2d');
+    const chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: [{%for label in labels_tags%}'{{label}}',{% endfor %}],
+            datasets: [{
+                label: 'Suma',
+                data: [{%for data in data_tags %} {{data}} ,{% endfor %}],
+                backgroundColor: [
+                        'rgba(240, 105, 105, 0.644)',
+                        'rgba(115, 255, 102, 0.596)' 
+                        
+  
+                    ],
+                borderColor: [
+                    'rgba(240, 105, 105, 0.644)',
+                    'rgba(115, 255, 102, 0.596)' 
+                ],
+            }],
+             
+        },options:{
+            indexAxis: 'y',
+            plugins:{
+                title:{
+                    display:true,
+                    text: 'Suma wg. tagów'
+                }
+            }
+        }
+
+        });
+    }) 
+    </script>
+
+<div class="card text-center mb-1" >
+    <div class="card-header">
+        <h1>Raporty {{month}} {{year}}</h1>
+    </div>
+    <div class="card-body">
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                <a class="btn btn-primary" href="{% url "financeAwareness:expense_income_details" %}">Raport Wydatki i przychody</a>       
+                </div>
+                <div class="card-body">
+                <canvas id="expense_income_chart"></canvas>
+                </div>
+            </div>
+        </div>       
+    </div>  
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                <a class="btn btn-primary" href="{% url "financeAwareness:tags_details" %}">Raport tagów</a> 
+                </div>
+                <div class="card-body">
+                <canvas id="tags_chart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                <a class="btn btn-primary" href="{% url "financeAwareness:category_details" %}">Raport kategorii</a>        
+                </div>
+                <div class="card-body">
+                <canvas id="category_expense_chart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                <a class="btn btn-primary" href="{% url "financeAwareness:planned_details" %}">Raport planowanych i nieplanowanych</a>       
+                </div>
+                <div class="card-body">
+                <canvas id="planned_chart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                <a class="btn btn-primary" href="{% url "financeAwareness:recurring_details" %}">Raport stałych transakcji</a>        
+                </div>
+                <div class="card-body">
+                <canvas id="recurring_expense_income_chart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>  
+</div>
+{% endblock %}
+

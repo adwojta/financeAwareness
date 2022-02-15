@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %} Szukaj transakcji {% endblock %}
+{% block content %}
+<script>       
+    $( function() {
+    $( "#id_date_from" ).datepicker({
+    showWeek: true,
+    dateFormat: 'dd.mm.yy',
+    regional: 'pl',
+    firstDay: 1
+    });
+} );
+
+$( function() {
+    $( "#id_date_to" ).datepicker({
+    showWeek: true,
+    dateFormat: 'dd.mm.yy',
+    regional: 'pl',
+    firstDay: 1
+    });
+} );
+
+function SearchSubcategories(element){
+    var category = $('#id_categories').val()
+    $.ajax({
+        type:'get',
+        url:"{% url 'financeAwareness:ajaxSubcategories' %}",
+        data:{'category':category},
+        success: function(response,status,jqXHR){
+            if(jqXHR.status=="200"){
+                console.log($(element).nextAll('select').first())
+                console.log(element)
+                $(element).nextAll('select').first().empty()                                  
+            data = JSON.parse(response['subcategories'])                 
+            $.each(data, function(i, item){
+                var optionText = item['fields']['name']
+                var optionValue = item['pk']
+                $(element).nextAll('select').first().append($('<option>').val(optionValue).text(optionText))
+                }                                               
+            )
+            $(element).nextAll('select').first().append($('<option>').val(-1).text('brak'))  
+            }else{
+                $(element).nextAll('select').first().empty() 
+                $(element).nextAll('select').first().append($('<option>').val(-1).text("brak"))
+            }
+        }
+    })
+}
+
+function SearchCategories(element){
+    var transaction_type = $('#id_transaction_type').val()
+    console.log(transaction_type)
+    $.ajax({
+        type:'get',
+        url:"{% url 'financeAwareness:ajaxCategories' %}",
+        data:{'transaction_type':transaction_type},
+        success: function(response,status,jqXHR){
+            if(jqXHR.status=="200"){
+                console.log($(element).nextAll('select').first())
+                console.log(element)
+                $(element).nextAll('select').first().empty()                                  
+            data = JSON.parse(response['categories'])                 
+            $.each(data, function(i, item){
+                var optionText = item['fields']['name']
+                var optionValue = item['pk']
+                $(element).nextAll('select').first().append($('<option>').val(optionValue).text(optionText))
+                }                
+            )
+            $(element).nextAll('select').first().append($('<option>').val(-1).text('brak')) 
+            }else{
+                $(element).nextAll('select').first().empty() 
+                $(element).nextAll('select').first().append($('<option>').val(-1).text("brak"))
+            }                                 
+        }
+    })
+}
+</script>
+<div class="card">
+    <div class="card-header">
+        <h3>Szukaj transakcji</h3>
+    </div>
+    <div class="card-body">
+        <form action="#" method="post">
+            <div class="row">
+                <div class="col">
+                    {{search_form.date_from.label_tag}}   
+                    {{search_form.date_from}}
+                </div>
+                <div class="col">
+                    {{search_form.date_to.label_tag}}   
+                    {{search_form.date_to}}
+                </div>
+            </div>            
+            {{search_form.search.label_tag}}   
+            {{search_form.search}}
+            {{search_form.transaction_type.label_tag}}   
+            {{search_form.transaction_type}}
+            <label for="id_categories">Kategoria:</label>
+            <select name="categories" class="form-control" onclick="SearchSubcategories(this)" id="id_categories">
+                <option value="-1" selected="">-------</option>
+              </select>
+            <label for="id_subcategories">Podkategoria:</label>
+            <select name="subcategories" class="form-control" id="id_subcategories">              
+                <option value="-1" selected="">-------</option>
+            </select>
+            {{search_form.planned.label_tag}}   
+            {{search_form.planned}}
+            {{search_form.tags.label_tag}}   
+            {{search_form.tags}}
+            {% csrf_token %}
+            <input class="btn btn-primary" type="submit" value="Szukaj">
+        </form>
+        </div>
+    </div>
+{% endblock %}

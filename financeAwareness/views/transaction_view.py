@@ -1,15 +1,19 @@
 from abc import ABC, abstractmethod
+import datetime
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.core import serializers
-from financeAwareness.forms import TransactionForm,TransactionItemForm
+from financeAwareness.forms import SearchForm, TransactionForm,TransactionItemForm
 from financeAwareness.models.category import Category
 from financeAwareness.models.transaction import Transaction
 from django.core.paginator import Paginator,EmptyPage,PageNotAnInteger
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.edit import CreateView,UpdateView
 from django.views.generic.base import TemplateView
+from django.contrib.postgres.search import SearchVector
+
+from financeAwareness.models.transactionItem import TransactionItem
 
 class AbstractTransaction(ABC):
     type = ""
@@ -333,7 +337,6 @@ class TransactionDelete(AbstractDelete):
 def getSubcategories(request):
     if request.is_ajax and request.method == 'GET':
         category = request.GET['category']
-
         try:
             master_category = Category.objects.get(id=category)
             subcategories = Category.objects.filter(master_category = master_category)
@@ -345,3 +348,65 @@ def getSubcategories(request):
         except:
             return HttpResponse(status=204)
 
+@login_required
+def getCategories(request):
+    if request.is_ajax and request.method == 'GET':
+        transaction_type = request.GET['transaction_type']
+        if transaction_type == None:
+            return HttpResponse(status=404)
+        try:
+            categories = Category.objects.filter(user_id=request.user.id,income=transaction_type,master_category=None)
+            categories_JSON = serializers.serialize('json',categories)
+            return JsonResponse({'categories':categories_JSON},status=200)
+        except:
+            return HttpResponse(status=204)
+
+@login_required
+def search_transactions(request):
+    if request.method =='POST':
+        search_form = SearchForm(data=request.POST,user =request.user)
+        if search_form.is_valid():   
+            clean_data = search_form.cleaned_data
+            transactions = None
+            value = clean_data['search']
+            transactions = Transaction.objects.annotate(search = SearchVector('name','description'),).filter(search=value,user_id = request.user.id,type__in=['expense','income'])
+            if transactions.exists():
+                transactions = transactions | Transaction.objects.filter(id__in=(TransactionItem.objects.annotate(search = SearchVector('item_name'),).filter(search=value).values('transaction_id').distinct()),user_id = request.user.id,type__in=['expense','income']) 
+            else:
+                transactions = Transaction.objects.filter(id__in=(TransactionItem.objects.annotate(search = SearchVector('item_name'),).filter(search=value).values('transaction_id').distinct()),user_id = request.user.id,type__in=['expense','income']) 
+            
+            if transactions.exists():
+                transactions = transactions | Transaction.objects.filter(tags__in=clean_data['tags'],user_id = request.user.id,type__in=['expense','income'])
+            else:
+                transactions = Transaction.objects.filter(tags__in=clean_data['tags'],user_id = request.user.id,type__in=['expense','income'])
+            
+            if clean_data['date_from'] and clean_data['date_to'] and clean_data['date_to'] > clean_data['date_from']:
+                if transactions.exists():
+                    transactions = Transaction.objects.filter(date__range=[(clean_data['date_from']),(clean_data['date_to'] + datetime.timedelta(days=1))],user_id = request.user.id,type__in=['expense','income'])
+                else:               
+                    transactions = transactions & Transaction.objects.filter(date__range=[(clean_data['date_from']),(clean_data['date_to'] + datetime.timedelta(days=1))],user_id = request.user.id,type__in=['expense','income'])
+
+            if bool(request.POST['subcategories']) and int(request.POST['subcategories']) != -1:
+                category = request.POST['subcategories']
+                if transactions.exists():
+                    transactions = transactions & Transaction.objects.filter(id__in=TransactionItem.objects.filter(category_id=category).values('transaction_id').distinct())
+                else:
+                    transactions = Transaction.objects.filter(id__in=TransactionItem.objects.filter(category_id=category).values('transaction_id').distinct(),type__in=['expense','income'])
+            elif bool(request.POST['categories']) and int(request.POST['categories']) != -1:
+                category = Category.objects.filter(user_id = request.user.id,master_category=request.POST['categories'])
+                category = category | Category.objects.filter(id=request.POST['categories'])
+                if transactions.exists():
+                    transactions = transactions & Transaction.objects.filter(id__in=TransactionItem.objects.filter(category_id__in=category).values('transaction_id').distinct(),type__in=['expense','income'])
+                else:
+                    transactions = Transaction.objects.filter(id__in=TransactionItem.objects.filter(category_id__in=category).values('transaction_id').distinct(),type__in=['expense','income'])
+
+            if clean_data['planned']:
+                if transactions.exists():
+                    transactions = transactions & Transaction.objects.filter(id__in=TransactionItem.objects.filter(is_planned=clean_data['planned'],type__in=['expense','income']).values('transaction_id').distinct())
+                else:
+                    transactions = Transaction.objects.filter(id__in=TransactionItem.objects.filter(is_planned=clean_data['planned'],type__in=['expense','income']).values('transaction_id').distinct())
+
+        return render(request, 'views/transaction/transaction_search_results.html',{'transactions': transactions})
+    else:
+        search_form = SearchForm(user = request.user)
+    return render(request, 'views/transaction/transaction_search.html',{'search_form': search_form})

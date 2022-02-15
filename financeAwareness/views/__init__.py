@@ -9,7 +9,7 @@ from .subcategory_view import subcategory_form,subcategory_form_delete,subcatego
 
 from .transfer_view import transfer_form,transfer_form_delete,transfer_form_update
 
-from .transaction_view import (getSubcategories,
+from .transaction_view import (getSubcategories,search_transactions,getCategories,
 CreateExpense,CreateIncome,TransactionUpdate,TransactionDetailView,TransactionListView,TransactionDelete)
 
 from .recurring_view import (RecurringAdd,RecurringDelete,RecurringDetailView,RecurringForm,
@@ -17,3 +17,5 @@ RecurringListView,RecurringUpdate,CreateRecurringExpense,CreateRecurringIncome)
 
 from .planned_view import (planned_to_pdf,
 PlannedAdd,PlannedDelete,PlannedDetailView,PlannedListView,PlannedUpdate,CreatePlannedExpense)
+
+from .reports import reports_list,recurring_details,tags_details,planned_details,category_details,expense_income_details

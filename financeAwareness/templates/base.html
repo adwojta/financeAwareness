@@ -8,10 +8,14 @@
         <link href="{% static "css/site.css" %}" rel="stylesheet">
         <link href="{% static "css/bootstrap.min.css" %}" rel="stylesheet">
         <script src="{% static "js/bootstrap.min.js" %}"></script>
-        <script src="{% static "js/site.js" %}"></script>
-        <link rel="stylesheet" href="//code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
-        <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
-        <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.js"></script>
+        <script src="{% static "js/site.js" %}"></script>        
+        <script src="{% static "js/jquery-3.6.0.min.js" %}"></script>        
+        <script src="{% static "js/jquery-ui.min.js" %}"></script>
+        <script src="{% static "js/datepicker-pl.js" %}"></script> 
+        <link href="{% static "css/jquery-ui.min.css" %}" rel="stylesheet">
+        <link href="{% static "css/jquery-ui.structure.min.css" %}' rel="stylesheet">
+        <link href="{% static "css/jquery-ui.theme.min.css" %}" rel="stylesheet">
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>       
         <script> 
         var subcategories = "{% url 'financeAwareness:ajaxSubcategories' %}" 
         </script>
@@ -39,16 +43,16 @@
                                 <a class="nav-link" href="{% url "financeAwareness:accounts" %}">Konta i cele</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="{% url "financeAwareness:password_change" %}">Raporty</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url "financeAwareness:password_change" %}">Zmiana hasła</a>
-                            </li>
+                                <a class="nav-link" href="{% url "financeAwareness:reports_list" %}">Raporty</a>
+                            </li>                           
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url "financeAwareness:recurrings" %}">Stałe transakcje</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url "financeAwareness:planned" %}">Planuj wydatki</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url "financeAwareness:password_change" %}">Zmiana hasła</a>
                             </li>
                             {% if request.user.is_authenticated %}                   
                             <li class="nav-item">

@@ -1,0 +1,319 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %} Transakcje {% endblock %}
+
+{% block content %}
+
+<script>
+$( function() {
+    $( "#id_date_from" ).datepicker({
+    showWeek: true,
+    dateFormat: 'dd.mm.yy',
+    regional: 'pl',
+    firstDay: 1
+    });
+} );
+
+$( function() {
+    $( "#id_date_to" ).datepicker({
+    showWeek: true,
+    dateFormat: 'dd.mm.yy',
+    regional: 'pl',
+    firstDay: 1
+    });
+} );
+
+    $(document).ready(function(){
+    const ctx = document.getElementById('chart').getContext('2d');
+    const chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: [{%for label in labels%}'{{label}}',{% endfor %}],
+            datasets: [{
+                label: 'Suma',
+                data: [{%for data in data %} {{data}} ,{% endfor %}],
+                backgroundColor: [
+                        'rgba(240, 105, 105, 0.644)',
+                        'rgba(115, 255, 102, 0.596)',
+                        'rgba(5, 143, 255, 0.774)',
+                        'rgba(241, 241, 107, 0.774)',
+                        'rgba(255, 5, 213, 0.774)',
+                        'rgba(5, 247, 255, 0.774)',
+                    ],
+                borderColor: [
+                    'rgba(240, 105, 105, 0.644)',
+                    'rgba(115, 255, 102, 0.596)',
+                    'rgba(5, 143, 255, 0.774)',
+                    'rgba(241, 241, 107, 0.774)',
+                    'rgba(255, 5, 213, 0.774)',
+                    'rgba(5, 247, 255, 0.774)',
+                ],
+            }],
+             
+        },options:{
+            indexAxis: 'y'
+        }
+
+        });
+    })
+
+    $(document).ready(function(){
+    const ctx = document.getElementById('chart_week').getContext('2d');
+    const chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: [{%for label in labels_week%}'{{label}}',{% endfor %}],
+            datasets: [{
+                label: 'Suma',
+                data: [{%for data in data_week %} {{data}} ,{% endfor %}],
+                backgroundColor: [
+                        'rgba(240, 105, 105, 0.644)',
+                        'rgba(115, 255, 102, 0.596)',
+                        'rgba(5, 143, 255, 0.774)',
+                        'rgba(241, 241, 107, 0.774)',
+                        'rgba(255, 5, 213, 0.774)',
+                        'rgba(5, 247, 255, 0.774)',
+                    ],
+                borderColor: [
+                        'rgba(240, 105, 105, 0.644)',
+                        'rgba(115, 255, 102, 0.596)',
+                        'rgba(5, 143, 255, 0.774)',
+                        'rgba(241, 241, 107, 0.774)',
+                        'rgba(255, 5, 213, 0.774)',
+                        'rgba(5, 247, 255, 0.774)',
+                ],
+            }],
+             
+        },options:{
+            indexAxis: 'y'
+        }
+
+        });
+    })
+    $(document).ready(function(){
+    const ctx = document.getElementById('chart_year').getContext('2d');
+    const chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: [{%for label in labels_year%}'{{label}}',{% endfor %}],
+            datasets: [{
+                label: 'Suma',
+                data: [{%for data in data_year %} {{data}} ,{% endfor %}],
+                backgroundColor: [
+                        'rgba(240, 105, 105, 0.644)',
+                        'rgba(115, 255, 102, 0.596)',
+                        'rgba(5, 143, 255, 0.774)',
+                        'rgba(241, 241, 107, 0.774)',
+                        'rgba(255, 5, 213, 0.774)',
+                        'rgba(5, 247, 255, 0.774)',                   
+                        ],
+                borderColor: [
+                    'rgba(240, 105, 105, 0.644)',
+                    'rgba(115, 255, 102, 0.596)',
+                    'rgba(5, 143, 255, 0.774)',
+                    'rgba(241, 241, 107, 0.774)',
+                    'rgba(255, 5, 213, 0.774)',
+                    'rgba(5, 247, 255, 0.774)',
+                ],
+            }],
+             
+        },options:{
+            indexAxis: 'y'
+        }
+
+        });
+    })
+    $(document).ready(function(){
+    const ctx = document.getElementById('chart_month').getContext('2d');
+    const chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: [{%for label in labels_month%}'{{label}}',{% endfor %}],
+            datasets: [{
+                label: 'Suma',
+                data: [{%for data in data_month %} {{data}} ,{% endfor %}],
+                backgroundColor: [
+                        'rgba(240, 105, 105, 0.644)',
+                        'rgba(115, 255, 102, 0.596)',
+                        'rgba(5, 143, 255, 0.774)',
+                        'rgba(241, 241, 107, 0.774)',
+                        'rgba(255, 5, 213, 0.774)',
+                        'rgba(5, 247, 255, 0.774)', 
+                    ],
+                borderColor: [
+                    'rgba(240, 105, 105, 0.644)',
+                    'rgba(115, 255, 102, 0.596)',
+                    'rgba(5, 143, 255, 0.774)',
+                    'rgba(241, 241, 107, 0.774)',
+                    'rgba(255, 5, 213, 0.774)',
+                    'rgba(5, 247, 255, 0.774)',
+                ],
+            }],
+             
+        },options:{
+            indexAxis: 'y'
+        }
+
+        });
+    })
+    $(document).ready(function(){
+    const ctx = document.getElementById('chart_quarter').getContext('2d');
+    const chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: [{%for label in labels_quarter%}'{{label}}',{% endfor %}],
+            datasets: [{
+                label: 'Suma',
+                data: [{%for data in data_quarter %} {{data}} ,{% endfor %}],
+                backgroundColor: [
+                        'rgba(240, 105, 105, 0.644)',
+                        'rgba(115, 255, 102, 0.596)',
+                        'rgba(5, 143, 255, 0.774)',
+                        'rgba(241, 241, 107, 0.774)',
+                        'rgba(255, 5, 213, 0.774)',
+                        'rgba(5, 247, 255, 0.774)',
+                        
+  
+                    ],
+                borderColor: [
+                    'rgba(240, 105, 105, 0.644)',
+                    'rgba(115, 255, 102, 0.596)',
+                    'rgba(5, 143, 255, 0.774)',
+                    'rgba(241, 241, 107, 0.774)',
+                    'rgba(255, 5, 213, 0.774)',
+                    'rgba(5, 247, 255, 0.774)',
+                ],
+            }],
+             
+        },options:{
+            indexAxis: 'y'
+        }
+
+        });
+    })
+    $(document).ready(function(){
+    const ctx = document.getElementById('chart_all').getContext('2d');
+    const chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: [{%for label in labels_all%}'{{label}}',{% endfor %}],
+            datasets: [{
+                label: 'Suma',
+                data: [{%for data in data_all %} {{data}} ,{% endfor %}],
+                backgroundColor: [
+                        'rgba(240, 105, 105, 0.644)',
+                        'rgba(115, 255, 102, 0.596)',
+                        'rgba(5, 143, 255, 0.774)',
+                        'rgba(241, 241, 107, 0.774)',
+                        'rgba(255, 5, 213, 0.774)',
+                        'rgba(5, 247, 255, 0.774)',
+                        
+  
+                    ],
+                borderColor: [
+                    'rgba(240, 105, 105, 0.644)',
+                    'rgba(115, 255, 102, 0.596)',
+                    'rgba(5, 143, 255, 0.774)',
+                    'rgba(241, 241, 107, 0.774)',
+                    'rgba(255, 5, 213, 0.774)',
+                    'rgba(5, 247, 255, 0.774)', 
+                ],
+            }],
+             
+        },options:{
+            indexAxis: 'y'
+        }
+
+        });
+    })
+    </script>
+
+<div class="card text-center mb-1" >
+    <div class="card-header">
+        <h1>Transakcje stałe</h1>
+        <form action="#" method="post">
+        {% csrf_token %}
+        <div class="row">
+                <div class="col">
+                    {{date_form.date_from.label_tag}}   
+                    {{date_form.date_from}}
+                </div>
+                <div class="col">
+                    {{date_form.date_to.label_tag}}   
+                    {{date_form.date_to}}
+                </div>
+        </div>  
+        <div class="row"><input class="btn btn-primary" type="submit" value="odśwież"></div>
+        </form>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-header">
+                    Nadchodzące transakcje w danym okresie
+                    </div>
+                    <div class='card-body'>
+                    <canvas id="chart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card">
+                    <div class="card-header">
+                    Stałe transakcje
+                    </div>
+                    <div class='card-body'>
+                    <canvas id="chart_all"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-header">
+                    Transakcje tygodniowe
+                    </div>
+                    <div class='card-body'>
+                    <canvas id="chart_week"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card">
+                    <div class="card-header">
+                    Transakcje miesięczne
+                    </div>
+                    <div class='card-body'>
+                    <canvas id="chart_month"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div> 
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-header">
+                    Transakcje kwartalne
+                    </div>
+                    <div class='card-body'>
+                    <canvas id="chart_quarter"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card">
+                    <div class="card-header">
+                    Transakcje roczne
+                    </div>
+                    <div class='card-body'>
+                    <canvas id="chart_year"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>         
+    </div>  
+</div>
+{% endblock %}
+
