@@ -1,28 +1,28 @@
 {% extends "base.html" %}
 
-{% block title %} Dodaj cel {% endblock %}
+{% block title %} Dodaj transfer {% endblock %}
 {% block content %}
 <script>       
     $( function() {
-    $( "#id_due_date" ).datepicker({
+    $( "#id_date" ).datepicker({
     showWeek: true,
     dateFormat: 'dd.mm.yy',
     regional: 'pl',
     firstDay: 1
     });
 } );
-
-</script>
+</script>   
 <div class="card">
     <div class="card-header">
-        <h3>Dodaj cel</h3>
+    <h3>Wykonaj cel</h3>
     </div>
     <div class="card-body">
         <form action="" method="post">
-            {{saving_goal_form.as_p}}
+            {{transfer_form.as_p}}
             {% csrf_token %}
-            <p><input class="btn btn-primary"type="submit" value="Dodaj"></p>
+            <p><input class="btn btn-primary" type="submit" value="Dodaj"></p>
         </form>
     </div>
 </div>
+
 {% endblock %}

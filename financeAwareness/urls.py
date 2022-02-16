@@ -77,14 +77,15 @@ urlpatterns = [
 
     #saving goal
     path('savings/new',views.saving_goal_form,name='saving_goal_form'),
+    path('savings/completed/<int:account_id>',views.saving_goal_accomplished,name='saving_goal_accomplished'),
     path('savings/update/<int:account_id>',views.saving_goal_form_update,name='saving_goal_form_update'),
     path('savings/delete/<int:account_id>',views.saving_goal_form_delete,name='saving_goal_form_delete'),
 
     #reports
     path('reports/',views.reports_list,name='reports_list'),
-    path('reports/category',views.category_details,name='category_details'),
-    path('reports/tags',views.tags_details,name='tags_details'),
-    path('reports/planned',views.planned_details,name='planned_details'),
-    path('reports/recurring',views.recurring_details,name='recurring_details'),
-    path('reports/details',views.expense_income_details,name='expense_income_details'),
+    path('reports/category',views.category_details_report,name='category_details'),
+    path('reports/tags',views.tags_details_report,name='tags_details'),
+    path('reports/planned',views.planned_details_report,name='planned_details'),
+    path('reports/recurring',views.recurring_details_report,name='recurring_details'),
+    path('reports/details',views.expense_income_details_report,name='expense_income_details'),
 ]

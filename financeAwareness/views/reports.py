@@ -88,7 +88,7 @@ def reports_list(request):
     'labels_planned':labels_planned,'data_planned':data_planned,
     'labels_tags':labels_tags,'data_tags':data_tags})
 
-def expense_income_details(request):
+def expense_income_details_report(request):
     labels =[]
     data =[]
     if request.method == 'POST':
@@ -117,7 +117,7 @@ def expense_income_details(request):
         data = [int(expense),int(income)]
     return render(request, 'views/report/report_expense_income.html',{'date_form':date_form,'labels':labels,'data':data})
 
-def category_details(request):
+def category_details_report(request):
     labels =[]
     data =[]
     labels_subcategories =[]
@@ -263,7 +263,7 @@ def category_details(request):
     'labels_income':labels_income,'data_income':data_income,
     'labels_income_subcategories':labels_income_subcategories,'data_income_subcategories':data_income_subcategories})
 
-def tags_details(request):
+def tags_details_report(request):
     labels =[]
     data =[]
     if request.method == 'POST':
@@ -296,7 +296,7 @@ def tags_details(request):
 
     return render(request, 'views/report/report_tags.html',{'date_form':date_form,'labels':labels,'data':data})
 
-def planned_details(request):
+def planned_details_report(request):
     labels =[]
     data =[]
     if request.method == 'POST':
@@ -332,7 +332,7 @@ def planned_details(request):
 
     return render(request, 'views/report/report_planned.html',{'date_form':date_form,'labels':labels,'data':data})
 
-def recurring_details(request):
+def recurring_details_report(request):
     
     labels=[]
     labels_month=[]

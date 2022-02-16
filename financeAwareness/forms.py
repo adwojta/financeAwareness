@@ -170,7 +170,7 @@ class AccountForm(forms.ModelForm):
 class SavingGoalForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["due_date"] = forms.DateField(widget=forms.SelectDateWidget())
+        self.fields["due_date"] = forms.DateField(widget=forms.DateInput())
 
         #Labals
         self.fields["name"].label = "Nazwa celu"
@@ -181,7 +181,7 @@ class SavingGoalForm(forms.ModelForm):
         for name in self.fields.keys():
             self.fields[name].widget.attrs.update({'class': 'form-control',})
 
-        self.fields["is_active_saving_goal"].widget.attrs.update({'class': 'form-check-input',})     
+        self.fields["is_active_saving_goal"].widget.attrs.update({'class': 'form-check-input',})       
 
     class Meta:
         model = Account
@@ -189,19 +189,27 @@ class SavingGoalForm(forms.ModelForm):
 
 
 class TransferForm(forms.ModelForm):
-    def __init__(self,User, *args, **kwargs):
+    def __init__(self,User,saving_goal=False, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        if saving_goal:
+            self.fields["transfer_account"] = forms.ModelChoiceField(queryset=Account.objects.filter(user_id=User,is_saving_goal=False))
+        else:
+            self.fields["transfer_account"] = forms.ModelChoiceField(queryset=Account.objects.filter(user_id=User,accomplished_date=None))       
         self.fields["date"] = forms.DateField(widget=forms.DateInput())
-        self.fields["account_id"] = forms.ModelChoiceField(queryset=Account.objects.filter(user_id=User))
-        self.fields["transfer_account"] = forms.ModelChoiceField(queryset=Account.objects.filter(user_id=User))
+        self.fields["account_id"] = forms.ModelChoiceField(queryset=Account.objects.filter(user_id=User,accomplished_date=None))
+        
 
         for name in self.fields.keys():
             self.fields[name].widget.attrs.update({'class': 'form-control',})
 
-        self.fields["date"].label = "Wartość"
+        self.fields["value"].label = "Wartość"
         self.fields["date"].label = "Data"
         self.fields["account_id"].label = "Konto"
         self.fields["transfer_account"].label = "Konto docelowe"
+
+        if saving_goal:
+            self.fields["value"].widget.attrs['readonly'] = True
+            self.fields["account_id"].widget.attrs['readonly'] = True
 
     class Meta:
         model = Transaction

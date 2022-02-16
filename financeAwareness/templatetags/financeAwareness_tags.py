@@ -45,9 +45,11 @@ def active_goal(user):
         months = (goal.due_date.year - date.today().year)*12 + (goal.due_date.month - date.today().month)
         if months < 0:
             remaining = False
-        else:
+        elif months > 0:
             remaining = goal.goal_value - goal.value
             remaining = round(remaining/months)
+        else:
+            remaining = goal.goal_value - goal.value
     else:
         remaining = False
 

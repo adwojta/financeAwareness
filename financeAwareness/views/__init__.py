@@ -2,7 +2,7 @@ from .tag_view import tag_form,tag_form_delete,tag_form_update,tag_list
 from .register import register, index
 
 from .account_view import account_form,account_form_delete,account_form_update,account_list
-from .saving_goal_view import saving_goal_form,saving_goal_form_delete,saving_goal_form_update
+from .saving_goal_view import saving_goal_form,saving_goal_form_delete,saving_goal_form_update,saving_goal_accomplished
 
 from .category_view import category_details,category_form,category_form_delete,category_form_update,category_list
 from .subcategory_view import subcategory_form,subcategory_form_delete,subcategory_form_update
@@ -18,4 +18,4 @@ RecurringListView,RecurringUpdate,CreateRecurringExpense,CreateRecurringIncome)
 from .planned_view import (planned_to_pdf,
 PlannedAdd,PlannedDelete,PlannedDetailView,PlannedListView,PlannedUpdate,CreatePlannedExpense)
 
-from .reports import reports_list,recurring_details,tags_details,planned_details,category_details,expense_income_details
+from .reports import reports_list,recurring_details_report,tags_details_report,planned_details_report,category_details_report,expense_income_details_report

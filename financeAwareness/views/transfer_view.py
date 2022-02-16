@@ -78,11 +78,12 @@ def transfer_form_delete(request,transfer_id):
         return redirect('financeAwareness:transactions')       
     else:
         if request.method == 'POST':
-            from_account = Account.objects.get(id=transfer.from_account.id)
-            to_account = Account.objects.get(id=transfer.to_account.id)
+            from_account = Account.objects.get(id=transfer.account_id.id)
+            to_account = Account.objects.get(id=transfer.transfer_account.id)
 
-            from_account.value +=transfer.value
-            to_account.value -=transfer.value
+            if from_account.accomplished_date==None and to_account.accomplished_date==None:
+                from_account.value +=transfer.value
+                to_account.value -=transfer.value
             from_account.save()
             to_account.save()
 
