@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 import datetime
 import os
-from django.conf import settings
+from .site_view import AbstractDelete
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -14,7 +14,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.edit import CreateView,UpdateView
 from django.views.generic.base import TemplateView
 from django.contrib.postgres.search import SearchVector
-
 from financeAwareness.models.transactionItem import TransactionItem
 
 class AbstractTransaction(ABC):
@@ -22,7 +21,9 @@ class AbstractTransaction(ABC):
     category_type = ""
     items_valid = True
     get_view = ""
-    form = ""
+    title = ""
+    is_not_planned = True
+    form = None
     new_transaction = None
     tags = []
     items_data = []
@@ -43,7 +44,7 @@ class AbstractTransaction(ABC):
 
             self.item_subcategories = request.POST.getlist("subcategory")
             self.item_names = request.POST.getlist("item_name")
-            self.item_categories = request.POST.getlist("category_id")
+            self.item_categories = request.POST.getlist("category")
             self.item_values = request.POST.getlist("item_value")
             self.items_planned = request.POST.getlist("is_planned")
 
@@ -52,20 +53,20 @@ class AbstractTransaction(ABC):
     def set_tags(self):
         tag_to_add = []
         for tag in self.tags:
-            tag_to_add.append(Transaction.tags.through(transaction_id = self.transaction.id, tag_id=tag))
+            tag_to_add.append(Transaction.tags.through(transaction = self.transaction, tag_id=tag))
 
         Transaction.tags.through.objects.bulk_create(tag_to_add)
 
     def set_items(self,new_items=False):
         for i,item in enumerate(self.items_data):
             new_item = item.save(commit=False)
-            new_item.transaction_id = self.transaction
+            new_item.transaction = self.transaction
             if new_items:
                 new_item.id = None
             if int(self.item_subcategories[i]) == -1:
                 new_item.save()
             else:
-                new_item.category_id = Category.objects.get(id=self.item_subcategories[i])  
+                new_item.category = Category.objects.get(id=self.item_subcategories[i])  
                 new_item.save()
 
     @abstractmethod
@@ -73,34 +74,59 @@ class AbstractTransaction(ABC):
         pass
 
 class AbstractListView(LoginRequiredMixin,TemplateView,ABC):
-    success_view = ""
-    types = []
+    max_in_page = 16
+    type = []
+    title = ""
     def get(self, request, *args, **kwargs):
-        transactions = Transaction.objects.filter(user_id=request.user.id, type__in=self.types)
-        return render(request, self.success_view,{'transactions': transactions})
+        self.transactions_list = Transaction.objects.filter(user=request.user.id, type__in=self.type)
+        paginator = Paginator(self.transactions_list,self.max_in_page)
+        page_number = request.GET.get('page','1')
+        try:
+            transactions = paginator.page(page_number)
+        except PageNotAnInteger:
+            transactions = paginator.page(1)
+        except EmptyPage:
+            transactions = paginator.page(paginator.num_pages)
+
+        page_number = paginator.get_page(page_number)
+
+        return render(request, 'views/transaction/transactions.html',{'transactions': transactions,'page_number':page_number,'title':self.title})
 
 class AbstractDetailView(LoginRequiredMixin,TemplateView,ABC):
     redirect_view = ""
     success_view = ""
+    title =""
 
     def get(self, request,transaction_id, *args, **kwargs):
         transaction = get_object_or_404(Transaction,id=transaction_id)
-        if request.user != transaction.user_id:
+        if request.user != transaction.user:
             return redirect(self.redirect_view)       
         else:
             items = transaction.items.all()
-            return render(request, self.success_view,{'items': items,'transaction': transaction})
+            context = []
+            for item in items:
+                category = item.category
+                if category.master_category:
+                    subcategory = category
+                    item.category = category.master_category
+                else:
+                    subcategory = 'brak'
+                context.append([item,subcategory])
+            return render(request, 'views/transaction/transaction_details.html',{'context': context,'transaction': transaction,'title':self.title})
 
 class AbstractCreateTransaction(LoginRequiredMixin,CreateView,AbstractTransaction,ABC):
+    get_view = 'views/transaction/transaction_form.html'
+
     def set_items_data_form(self, request,is_planned, *args, **kwargs):       
         if is_planned:
             for item in range(self.items_amount):        
-                data={'item_name':self.item_names[item],'category_id':self.item_categories[item],"item_value":self.item_values[item],"is_planned":True}
+                data={'item_name':self.item_names[item],'category':self.item_categories[item],"item_value":self.item_values[item],"is_planned":True}
                 self.items_data.append(TransactionItemForm(User=request.user,data=data,type=self.category_type))
         else:        
             for item in range(self.items_amount):        
-                data={'item_name':self.item_names[item],'category_id':self.item_categories[item],"item_value":self.item_values[item],"is_planned":self.items_planned[item]}
+                data={'item_name':self.item_names[item],'category':self.item_categories[item],"item_value":self.item_values[item],"is_planned":self.items_planned[item]}
                 self.items_data.append(TransactionItemForm(User=request.user,data=data,type=self.category_type))
+        
 
     def post(self, request,is_planned=False, *args, **kwargs):    
         self.transaction_form = self.form(data=request.POST,files=request.FILES,User=request.user)
@@ -117,7 +143,7 @@ class AbstractCreateTransaction(LoginRequiredMixin,CreateView,AbstractTransactio
                 if not item.is_valid():
                     self.items_valid= False
             if self.items_valid:
-                self.new_transaction.user_id = request.user
+                self.new_transaction.user = request.user
                 self.new_transaction.type = self.type
                 self.new_transaction.save()                                                  
                 self.transaction = Transaction.objects.latest('id')
@@ -127,12 +153,13 @@ class AbstractCreateTransaction(LoginRequiredMixin,CreateView,AbstractTransactio
     def get(self, request, *args, **kwargs):
         self.transaction_item_forms = (TransactionItemForm(User=request.user,auto_id=False,type=self.category_type),)
         self.transaction_form = self.form(User=request.user)
-        return render(request, self.get_view,{'transaction_form': self.transaction_form,'transaction_item_forms': self.transaction_item_forms})
+        return render(request, self.get_view,{'transaction_form': self.transaction_form,'transaction_item_forms': self.transaction_item_forms,'title':self.title,'is_not_planned':self.is_not_planned})
 
 class AbstractUpdateTransaction(LoginRequiredMixin,UpdateView,AbstractTransaction,ABC):
+    get_view = 'views/transaction/transaction_form.html'
     transactionItems = None
     items_to_delete = []
-    path =None
+    path = None    
 
     def set_items_data_form(self, request,is_planned=False, *args, **kwargs):
         if self.items_amount < len(self.transactionItems):
@@ -142,38 +169,40 @@ class AbstractUpdateTransaction(LoginRequiredMixin,UpdateView,AbstractTransactio
         if is_planned:
             for item in range(self.items_amount):       
                 if item > len(self.transactionItems)-1:        
-                    data={'item_name':self.item_names[item],'category_id':self.item_categories[item],"item_value":self.item_values[item],"is_planned":True}
+                    data={'item_name':self.item_names[item],'category':self.item_categories[item],"item_value":self.item_values[item],"is_planned":True}
                     self.items_data.append(TransactionItemForm(User=request.user,data=data,type=self.category_type))
                 else:      
-                    data={'item_name':self.item_names[item],'category_id':self.item_categories[item],"item_value":self.item_values[item],"is_planned":True}
+                    data={'item_name':self.item_names[item],'category':self.item_categories[item],"item_value":self.item_values[item],"is_planned":True}
                     self.items_data.append(TransactionItemForm(User=request.user,data=data,instance=self.transactionItems[item],type=self.category_type))
         else:        
             for item in range(self.items_amount):       
                 if item > len(self.transactionItems)-1:        
-                    data={'item_name':self.item_names[item],'category_id':self.item_categories[item],"item_value":self.item_values[item],"is_planned":self.items_planned[item]}
+                    data={'item_name':self.item_names[item],'category':self.item_categories[item],"item_value":self.item_values[item],"is_planned":self.items_planned[item]}
+                    
                     self.items_data.append(TransactionItemForm(User=request.user,data=data,type=self.category_type))
-                else:      
-                    data={'item_name':self.item_names[item],'category_id':self.item_categories[item],"item_value":self.item_values[item],"is_planned":self.items_planned[item]}
-                    self.items_data.append(TransactionItemForm(User=request.user,data=data,instance=self.transactionItems[item],type=self.category_type))     
+                else:                         
+                    data={'item_name':self.item_names[item],'category':self.item_categories[item],"item_value":self.item_values[item],"is_planned":self.items_planned[item]}
+                    self.items_data.append(TransactionItemForm(User=request.user,data=data,instance=self.transactionItems[item],type=self.category_type)) 
 
     def form_valid(self, request, *args, **kwargs):
-        print(request.POST)
         if self.transaction_form.is_valid():
-            new_image= bool(request.FILES)
-            if request.POST.__contains__('image-clear'):
-                self.transaction.image.delete()
-            if new_image and self.path !=None:
-                os.unlink(self.path)
-            
             self.new_transaction = self.transaction_form.save(commit=False)
+
             for item in self.items_data:
                 if not item.is_valid():
                     self.items_valid= False
+            
+            if self.items_valid:
+                new_image= bool(request.FILES)
+                if request.POST.__contains__('image-clear'):
+                    self.transaction.image.delete()
+                if new_image and self.path !=None:
+                    os.unlink(self.path)
 
 
     def update_transaction(self,request):
         if self.items_valid:
-            self.new_transaction.user_id = request.user
+            self.new_transaction.user = request.user
             self.new_transaction.type = self.type
             self.new_transaction.save()                                                  
             self.set_tags()
@@ -186,7 +215,7 @@ class AbstractUpdateTransaction(LoginRequiredMixin,UpdateView,AbstractTransactio
         self.transaction_form = self.form(User=request.user,instance=self.transaction)
         self.transactionItems = self.transaction.items.all()
         self.old_value = self.transaction.value
-        self.old_account = self.transaction.account_id
+        self.old_account = self.transaction.account
         self.type = self.transaction.type
         self.transaction_item_forms = []
 
@@ -221,35 +250,17 @@ class AbstractUpdateTransaction(LoginRequiredMixin,UpdateView,AbstractTransactio
         for item in self.transactionItems:
             self.transaction_item_forms.append(TransactionItemForm(User=request.user,instance=item,type=self.category_type))
 
-        return render(request, self.get_view,{'transaction_form': self.transaction_form,'transaction_item_forms': self.transaction_item_forms})
-
-class AbstractDelete(LoginRequiredMixin,TemplateView,ABC):
-    redirect_view = ""
-    get_view = ""
-
-    def setup(self, request, *args, **kwargs):
-        self.transaction = get_object_or_404(Transaction,id=kwargs['transaction_id'])
-        return super().setup(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        if request.user != self.transaction.user_id:
-            return redirect(self.redirect_view)       
-        else:          
-            self.transaction.delete()
-            return redirect(self.redirect_view)
-
-    def get(self, request,transaction_id, *args, **kwargs):
-        return render(request, self.get_view,{'transaction_id':transaction_id})
+        return render(request, self.get_view,{'transaction_form': self.transaction_form,'transaction_item_forms': self.transaction_item_forms,'title':self.title,'is_not_planned':self.is_not_planned,'update':True})
 
 class CreateExpense(AbstractCreateTransaction):
     type = 'expense'
     category_type = 'expense'
-    get_view = 'views/transaction/transaction_form.html'
+    title = 'Dodaj wydatek'
     form =TransactionForm
 
     def form_valid(self, request):
         super().form_valid(request)       
-        account = self.new_transaction.account_id
+        account = self.new_transaction.account
         account.value = account.value - self.new_transaction.value
         account.save()
 
@@ -260,12 +271,12 @@ class CreateExpense(AbstractCreateTransaction):
 class CreateIncome(AbstractCreateTransaction):
     type = 'income'
     category_type = 'income'
-    get_view = 'views/transaction/transaction_form.html'
+    title = 'Dodaj przychód'
     form =TransactionForm
 
     def form_valid(self, request):
         super().form_valid(request)
-        account = self.new_transaction.account_id
+        account = self.new_transaction.account
         account.value = account.value + self.new_transaction.value
         account.save()
 
@@ -274,19 +285,16 @@ class CreateIncome(AbstractCreateTransaction):
         return redirect('financeAwareness:transactions')
 
 class TransactionUpdate(AbstractUpdateTransaction):
-    get_view = 'views/transaction/transaction_update.html'
+    title = 'Zaktualizuj transakcje'
     form = TransactionForm
 
     def form_valid(self, request, *args, **kwargs):
         super().form_valid(request, *args, **kwargs)
         self.update_transaction(request)
-            
-    def post(self, request, *args, **kwargs):
-        super().post(request)
-        account = self.new_transaction.account_id
+        account = self.new_transaction.account
 
         if self.transaction.type == 'expense':
-            if self.old_account == self.new_transaction.account_id:
+            if self.old_account == self.new_transaction.account:
                 if self.old_value != self.new_transaction.value:
                     new_value = self.old_value - self.new_transaction.value
                     account.value = account.value + new_value
@@ -297,7 +305,7 @@ class TransactionUpdate(AbstractUpdateTransaction):
                 self.old_account.save()
                 account.save()
         elif self.new_transaction.type == 'income':
-            if self.old_account == self.new_transaction.account_id:
+            if self.old_account == self.new_transaction.account:
                 if self.old_value != self.new_transaction.value:
                     new_value = self.old_value - self.new_transaction.value
                     account.value = account.value - new_value
@@ -307,45 +315,37 @@ class TransactionUpdate(AbstractUpdateTransaction):
                 account.value = account.value + self.new_transaction.value
                 self.old_account.save()
                 account.save()
+            
+    def post(self, request, *args, **kwargs):
+        super().post(request)    
         return redirect('financeAwareness:transaction_details',transaction_id=self.new_transaction.id)
 
 class TransactionDetailView(AbstractDetailView):
     redirect_view = 'financeAwareness:transactions'
-    success_view = 'views/transaction/transaction_details.html'
+    title = 'Transakcja'
 
-class TransactionListView(LoginRequiredMixin,TemplateView):
-    max_in_page = 16
-    def get(self, request, *args, **kwargs):
-        transactions_list = Transaction.objects.filter(user_id=request.user.id, type__in=['income','expense','transfer'])
-        paginator = Paginator(transactions_list,self.max_in_page)
-        page_number = request.GET.get('page','1')
-        try:
-            transactions = paginator.page(page_number)
-        except PageNotAnInteger:
-            transactions = paginator.page(1)
-        except EmptyPage:
-            transactions = paginator.page(paginator.num_pages)
-
-        page_number = paginator.get_page(page_number)
-
-        return render(request, 'views/transaction/transactions.html',{'transactions': transactions,'page_number':page_number})
+class TransactionListView(AbstractListView):
+    type=['income','expense','transfer']
+    title='Transakcje'
 
 class TransactionDelete(AbstractDelete):
     redirect_view = 'financeAwareness:transactions'
-    get_view = 'views/transaction/transaction_delete.html'
+    model = Transaction
+    delete_type = "Transaction"
+    title = "Usuń transakcje"
 
     def post(self, request, *args, **kwargs):
-        account = self.transaction.account_id
-        if self.transaction.type == 'income':
-            account.value -= self.transaction.value
-        elif self.transaction.type == 'expense':
-            account.value += self.transaction.value
+        account = self.object.account
+        if self.object.type == 'income':
+            account.value -= self.object.value
+        elif self.object.type == 'expense':
+            account.value += self.object.value
         account.save()
         super().post(request)
         return redirect(self.redirect_view)
     
 @login_required
-def getSubcategories(request):
+def get_subcategories(request):
     if request.is_ajax and request.method == 'GET':
         category = request.GET['category']
         try:
@@ -360,13 +360,13 @@ def getSubcategories(request):
             return HttpResponse(status=204)
 
 @login_required
-def getCategories(request):
+def get_categories(request):
     if request.is_ajax and request.method == 'GET':
         transaction_type = request.GET['transaction_type']
         if transaction_type == None:
             return HttpResponse(status=404)
         try:
-            categories = Category.objects.filter(user_id=request.user.id,income=transaction_type,master_category=None)
+            categories = Category.objects.filter(user=request.user.id,is_income=transaction_type,master_category=None)
             categories_JSON = serializers.serialize('json',categories)
             return JsonResponse({'categories':categories_JSON},status=200)
         except:
@@ -374,50 +374,63 @@ def getCategories(request):
 
 @login_required
 def search_transactions(request):
+    max_in_page = 16
+    title = 'Znalezione transakcje'
     if request.method =='POST':
-        search_form = SearchForm(data=request.POST,user =request.user)
+        search_form = SearchForm(data=request.POST,user=request.user)
         if search_form.is_valid():   
             clean_data = search_form.cleaned_data
             transactions = None
             value = clean_data['search']
-            transactions = Transaction.objects.annotate(search = SearchVector('name','description'),).filter(search=value,user_id = request.user.id,type__in=['expense','income'])
+            transactions = Transaction.objects.annotate(search = SearchVector('name','description'),).filter(search=value,user = request.user.id,type__in=['expense','income'])
             if transactions.exists():
-                transactions = transactions | Transaction.objects.filter(id__in=(TransactionItem.objects.annotate(search = SearchVector('item_name'),).filter(search=value).values('transaction_id').distinct()),user_id = request.user.id,type__in=['expense','income']) 
+                transactions = transactions | Transaction.objects.filter(id__in=(TransactionItem.objects.annotate(search = SearchVector('item_name'),).filter(search=value).values('transaction').distinct()),user = request.user.id,type__in=['expense','income']) 
             else:
-                transactions = Transaction.objects.filter(id__in=(TransactionItem.objects.annotate(search = SearchVector('item_name'),).filter(search=value).values('transaction_id').distinct()),user_id = request.user.id,type__in=['expense','income']) 
+                transactions = Transaction.objects.filter(id__in=(TransactionItem.objects.annotate(search = SearchVector('item_name'),).filter(search=value).values('transaction').distinct()),user = request.user.id,type__in=['expense','income']) 
             
             if transactions.exists():
-                transactions = transactions | Transaction.objects.filter(tags__in=clean_data['tags'],user_id = request.user.id,type__in=['expense','income'])
+                transactions = transactions | Transaction.objects.filter(tags__in=clean_data['tags'],user = request.user.id,type__in=['expense','income'])
             else:
-                transactions = Transaction.objects.filter(tags__in=clean_data['tags'],user_id = request.user.id,type__in=['expense','income'])
+                transactions = Transaction.objects.filter(tags__in=clean_data['tags'],user = request.user.id,type__in=['expense','income'])
             
             if clean_data['date_from'] and clean_data['date_to'] and clean_data['date_to'] > clean_data['date_from']:
                 if transactions.exists():
-                    transactions = Transaction.objects.filter(date__range=[(clean_data['date_from']),(clean_data['date_to'] + datetime.timedelta(days=1))],user_id = request.user.id,type__in=['expense','income'])
+                    transactions = Transaction.objects.filter(date__range=[(clean_data['date_from']),(clean_data['date_to'] + datetime.timedelta(days=1))],user = request.user.id,type__in=['expense','income'])
                 else:               
-                    transactions = transactions & Transaction.objects.filter(date__range=[(clean_data['date_from']),(clean_data['date_to'] + datetime.timedelta(days=1))],user_id = request.user.id,type__in=['expense','income'])
+                    transactions = transactions & Transaction.objects.filter(date__range=[(clean_data['date_from']),(clean_data['date_to'] + datetime.timedelta(days=1))],user = request.user.id,type__in=['expense','income'])
 
             if bool(request.POST['subcategories']) and int(request.POST['subcategories']) != -1:
                 category = request.POST['subcategories']
                 if transactions.exists():
-                    transactions = transactions & Transaction.objects.filter(id__in=TransactionItem.objects.filter(category_id=category).values('transaction_id').distinct())
+                    transactions = transactions & Transaction.objects.filter(id__in=TransactionItem.objects.filter(category=category).values('transaction').distinct())
                 else:
-                    transactions = Transaction.objects.filter(id__in=TransactionItem.objects.filter(category_id=category).values('transaction_id').distinct(),type__in=['expense','income'])
+                    transactions = Transaction.objects.filter(id__in=TransactionItem.objects.filter(category=category).values('transaction').distinct(),type__in=['expense','income'])
             elif bool(request.POST['categories']) and int(request.POST['categories']) != -1:
-                category = Category.objects.filter(user_id = request.user.id,master_category=request.POST['categories'])
+                category = Category.objects.filter(user = request.user.id,master_category=request.POST['categories'])
                 category = category | Category.objects.filter(id=request.POST['categories'])
                 if transactions.exists():
-                    transactions = transactions & Transaction.objects.filter(id__in=TransactionItem.objects.filter(category_id__in=category).values('transaction_id').distinct(),type__in=['expense','income'])
+                    transactions = transactions & Transaction.objects.filter(id__in=TransactionItem.objects.filter(category__in=category).values('transaction').distinct(),type__in=['expense','income'])
                 else:
-                    transactions = Transaction.objects.filter(id__in=TransactionItem.objects.filter(category_id__in=category).values('transaction_id').distinct(),type__in=['expense','income'])
+                    transactions = Transaction.objects.filter(id__in=TransactionItem.objects.filter(category__in=category).values('transaction').distinct(),type__in=['expense','income'])
 
             if clean_data['planned']:
                 if transactions.exists():
-                    transactions = transactions & Transaction.objects.filter(id__in=TransactionItem.objects.filter(is_planned=clean_data['planned'],type__in=['expense','income']).values('transaction_id').distinct())
+                    transactions = transactions & Transaction.objects.filter(id__in=TransactionItem.objects.filter(is_planned=clean_data['planned']).values('transaction').distinct())
                 else:
-                    transactions = Transaction.objects.filter(id__in=TransactionItem.objects.filter(is_planned=clean_data['planned'],type__in=['expense','income']).values('transaction_id').distinct())
+                    transactions = Transaction.objects.filter(id__in=TransactionItem.objects.filter(is_planned=clean_data['planned']).values('transaction').distinct())
+        
+        paginator = Paginator(transactions,max_in_page)
+        page_number = request.GET.get('page','1')
+        try:
+            transactions = paginator.page(page_number)
+        except PageNotAnInteger:
+            transactions = paginator.page(1)
+        except EmptyPage:
+            transactions = paginator.page(paginator.num_pages)
 
-        return render(request, 'views/transaction/transaction_search_results.html',{'transactions': transactions})
+        page_number = paginator.get_page(page_number)
+
+        return render(request, 'views/transaction/transactions.html',{'transactions': transactions,'page_number':page_number,'title':title})
     else:
         search_form = SearchForm(user = request.user)
     return render(request, 'views/transaction/transaction_search.html',{'search_form': search_form})

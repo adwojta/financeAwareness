@@ -14,17 +14,18 @@ from financeAwareness.views.transaction_view import AbstractCreateTransaction, A
 
 #Planned
 class PlannedListView(AbstractListView):
-    success_view = 'views/planned/planned.html'
-    types = ['planned']
+    type = ['planned']
+    title='Listy planowanych wydatków'
 
 class PlannedDetailView(AbstractDetailView):
     redirect_view = 'financeAwareness:planned'
-    success_view = 'views/planned/planned_details.html'
+    title = 'Lista zakupowa'
 
 class CreatePlannedExpense(AbstractCreateTransaction):
     type = 'planned'
     category_type = 'expense'
-    get_view = 'views/planned/planned_form.html'
+    title = 'Dodaj liste planowanych wydatków'
+    is_not_planned = False
     form = TransactionForm
 
     def post(self, request,is_planned=True, *args, **kwargs):
@@ -32,7 +33,8 @@ class CreatePlannedExpense(AbstractCreateTransaction):
         return redirect('financeAwareness:planned')
 
 class PlannedUpdate(AbstractUpdateTransaction):
-    get_view = 'views/planned/planned_update.html'
+    title = 'Zaktualizuj liste planowanych wydatków'
+    is_not_planned = False
     form = TransactionForm
 
     def form_valid(self, request, *args, **kwargs):
@@ -44,12 +46,14 @@ class PlannedUpdate(AbstractUpdateTransaction):
         return redirect('financeAwareness:planned_details',transaction_id=self.new_transaction.id)
 
 class PlannedDelete(AbstractDelete):
-    redirect_view = 'financeAwareness:transactions'
-    get_view = 'views/planned/planned_delete.html'
+    redirect_view = 'financeAwareness:planned'
+    model = Transaction
+    delete_type = "Planned"
+    title = "Usuń listę zakupową"
 
 class PlannedAdd(AbstractUpdateTransaction):
     form = TransactionForm
-    get_view = 'views/planned/planned_add.html'
+    title = 'Dodaj wydatek'
     type = 'expense'
 
     def post(self, request, *args, **kwargs):
@@ -58,7 +62,7 @@ class PlannedAdd(AbstractUpdateTransaction):
 
     def form_valid(self, request, *args, **kwargs):
         super().form_valid(request)
-        account = self.new_transaction.account_id
+        account = self.new_transaction.account
         if self.items_valid:
             account.value = account.value - self.new_transaction.value
             

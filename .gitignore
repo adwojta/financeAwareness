@@ -169,3 +169,4 @@ financeAwareness/static/css/jquery-ui.structure.min.css
 financeAwareness/static/css/jquery-ui.theme.min.css
 financeAwareness/static/js/jquery-ui.min.js
 media/
+functional_tests/chromedriver.exe

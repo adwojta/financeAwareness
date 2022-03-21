@@ -22,9 +22,9 @@ urlpatterns = [
     path('transaction/expense/new',views.CreateExpense.as_view(),name='new_expense'),
     path('transaction/income/new',views.CreateIncome.as_view(),name='new_income'),
     path('transaction/<int:transaction_id>/update/',views.TransactionUpdate.as_view(),name='transaction_form_update'),
-    path('transaction/<int:transaction_id>/delete/',views.TransactionDelete.as_view(),name='transaction_form_delete'),
-    path('transaction/ajax/subcategories',views.getSubcategories,name='ajaxSubcategories'),
-    path('transaction/ajax/categories',views.getCategories,name='ajaxCategories'),
+    path('transaction/<int:id>/delete/',views.TransactionDelete.as_view(),name='transaction_form_delete'),
+    path('transaction/ajax/subcategories',views.get_subcategories,name='ajaxSubcategories'),
+    path('transaction/ajax/categories',views.get_categories,name='ajaxCategories'),
     path('transaction/search',views.search_transactions,name='search_transactions'),
 
     #planned
@@ -34,7 +34,7 @@ urlpatterns = [
     path('transaction/<int:transaction_id>/pdf',views.planned_to_pdf,name='planned_details_pdf'),
     path('transaction/planned/<int:transaction_id>/add',views.PlannedAdd.as_view(),name='planned_form_add'),
     path('transaction/planned/<int:transaction_id>/update',views.PlannedUpdate.as_view(),name='planned_form_update'),
-    path('transaction/planned/<int:transaction_id>/delete',views.PlannedDelete.as_view(),name='planned_form_delete'),
+    path('transaction/planned/<int:id>/delete',views.PlannedDelete.as_view(),name='planned_form_delete'),
 
     #recurring
     path('transaction/recurring',views.RecurringListView.as_view(),name='recurrings'),
@@ -43,7 +43,7 @@ urlpatterns = [
     path('transaction/recurring/<int:transaction_id>',views.RecurringDetailView.as_view(),name='recurring_details'),
     path('transaction/recurring/<int:transaction_id>/add',views.RecurringAdd.as_view(),name='recurring_form_add'),
     path('transaction/recurring/<int:transaction_id>/update',views.RecurringUpdate.as_view(),name='recurring_form_update'),
-    path('transaction/recurring/<int:transaction_id>/delete',views.RecurringDelete.as_view(),name='recurring_form_delete'),
+    path('transaction/recurring/<int:id>/delete',views.RecurringDelete.as_view(),name='recurring_form_delete'),
 
     #category
     path('categories',views.category_list,name='categories'),
@@ -51,41 +51,41 @@ urlpatterns = [
     path('categories/new/<str:income>',views.category_form,name='new_category'),
     path('categories/<int:category_id>',views.category_details,name='category_details'),
     path('categories/update/<int:category_id>',views.category_form_update,name='category_form_update'),
-    path('categories/delete/<int:category_id>',views.category_form_delete,name='category_form_delete'),
+    path('categories/delete/<int:id>',views.CategoryDelete.as_view(),name='category_form_delete'),
 
     #subcategory
     path('subcategories/new/<int:master_category>',views.subcategory_form,name='subcategory_form'),
     path('subcategories/update/<int:subcategory_id>',views.subcategory_form_update,name='subcategory_form_update'),
-    path('subcategories/delete/<int:subcategory_id>',views.subcategory_form_delete,name='subcategory_form_delete'),
+    path('subcategories/delete/<int:id>',views.SubcategoryDelete.as_view(),name='subcategory_form_delete'),
 
     #tag
     path('tags/',views.tag_list,name='tags'),
     path('tags/new',views.tag_form,name='new_tag'),
     path('tags/update/<int:tag_id>',views.tag_form_update,name='tag_form_update'),
-    path('tags/delete/<int:tag_id>',views.tag_form_delete,name='tag_form_delete'),
+    path('tags/delete/<int:id>',views.TagDelete.as_view(),name='tag_form_delete'),
 
     #account
     path('accounts/',views.account_list,name='accounts'),
     path('accounts/new',views.account_form,name='new_account'),
     path('accounts/update/<int:account_id>',views.account_form_update,name='account_form_update'),
-    path('accounts/delete/<int:account_id>',views.account_form_delete,name='account_form_delete'),
+    path('accounts/delete/<int:id>',views.AccountDelete.as_view(),name='account_form_delete'),
 
     #transfer
     path('accounts/transfer/new',views.transfer_form,name='transfer_form'),
     path('accounts/transfer/update/<int:transfer_id>',views.transfer_form_update,name='transfer_form_update'),
-    path('accounts/transfer/delete/<int:transfer_id>',views.transfer_form_delete,name='transfer_form_delete'),
+    path('accounts/transfer/delete/<int:id>',views.TransferDelete.as_view(),name='transfer_form_delete'),
 
     #saving goal
     path('savings/new',views.saving_goal_form,name='saving_goal_form'),
     path('savings/completed/<int:account_id>',views.saving_goal_accomplished,name='saving_goal_accomplished'),
     path('savings/update/<int:account_id>',views.saving_goal_form_update,name='saving_goal_form_update'),
-    path('savings/delete/<int:account_id>',views.saving_goal_form_delete,name='saving_goal_form_delete'),
+    path('savings/delete/<int:id>',views.GoalDelete.as_view(),name='saving_goal_form_delete'),
 
     #reports
     path('reports/',views.reports_list,name='reports_list'),
-    path('reports/category',views.category_details_report,name='category_details'),
-    path('reports/tags',views.tags_details_report,name='tags_details'),
-    path('reports/planned',views.planned_details_report,name='planned_details'),
-    path('reports/recurring',views.recurring_details_report,name='recurring_details'),
-    path('reports/details',views.expense_income_details_report,name='expense_income_details'),
+    path('reports/category',views.category_details_report,name='report_category_details'),
+    path('reports/tags',views.tags_details_report,name='report_tags_details'),
+    path('reports/planned',views.planned_details_report,name='report_planned_details'),
+    path('reports/recurring',views.recurring_details_report,name='report_recurring_details'),
+    path('reports/details',views.expense_income_details_report,name='report_expense_income_details'),
 ]

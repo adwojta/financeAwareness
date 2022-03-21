@@ -35,7 +35,7 @@ def available_funds_bank(user):
 
     return sum['value__sum']
 
-@register.inclusion_tag('views/account/saving_goal_active.html')
+@register.inclusion_tag('saving_goal_active.html')
 def active_goal(user):
     try:
         goal = Account.objects.get(user_id=user,is_active_saving_goal=True)
@@ -55,7 +55,7 @@ def active_goal(user):
 
     return {'remaining':remaining,'goal':goal}
 
-@register.inclusion_tag('views/recurring/recurring_next.html')
+@register.inclusion_tag('recurring_next.html')
 def reccuring_next(user):
     exists = True
     try:

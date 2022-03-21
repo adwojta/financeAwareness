@@ -1,30 +1,45 @@
 {% extends "base.html" %}
 {% load humanize %}
-{% block title %} Transakcje {% endblock %}
+{% block title %} {{title}} {% endblock %}
 
 {% block content %}
 <div class="card text-center mb-1" >
     <div class="card-header">
-        <h1>Transakcje</h1>
+        <h1>{{title}}</h1>
+        <div class="d-grid gap-2">
+        {% if title == "Transakcje" %}
         <a class="btn btn-primary" href="{% url "financeAwareness:new_expense" %}">Dodaj wydatek</a>
         <a class="btn btn-primary" href="{% url "financeAwareness:new_income" %}">Dodaj przychód</a>
         <a class="btn btn-primary" href="{% url "financeAwareness:transfer_form" %}">Dodaj transfer</a>
         <a class="btn btn-primary" href="{% url "financeAwareness:search_transactions" %}">Szukaj</a>
+        {% elif title == "Stałe transakcje" %}
+        <a class="btn btn-primary" href="{% url "financeAwareness:new_reccuring_expense" %}">Dodaj stały wydatek</a>
+        <a class="btn btn-primary" href="{% url "financeAwareness:new_reccuring_income" %}">Dodaj stały przychód</a>
+        {% elif title == "Listy planowanych wydatków" %}
+        <a class="btn btn-primary" href="{% url "financeAwareness:new_planned" %}">Zaplanuj wydatek</a>
+        {% else %}
+        <a class="btn btn-primary" href="{% url "financeAwareness:transactions" %}">Powrót</a>
+        {% endif %}
+        </div>
     </div>
     <div class="card-body">
-        <div class="row row-cols-2 row-cols-md-4 g-4">
+        <div class="row row-cols-2 row-cols-lg-4  g-4">
             {% for transaction in transactions %}
                 <div class="col">
-                    {% if transaction.type == "income" %}
+                    {% if transaction.type == "income" or transaction.type == "recurringIncome"%}
                     <div class="card text-center" id="income">
-                    {% elif transaction.type == "expense" %}
-                    <div class="card text-center" id="expense">
-                    {% else %}
+                    {% elif transaction.type == "transfer" %}
                     <div class="card text-center" id="transfer">
+                    {% else %}
+                    <div class="card text-center" id="expense">                 
                     {% endif %}
                         <div class="card-header">
                             {% if transaction.type == "transfer" %}
-                            <p>{{transaction.name}}</p>
+                            <p>{{transaction.name}}</p>                            
+                            {% elif transaction.type == "recurringIncome" or transaction.type == "recurringExpense" %}
+                            <p><a class="btn btn-outline-dark" id="details" href="{% url "financeAwareness:recurring_details" transaction.id %}">{{transaction.name}}</a></p>
+                            {% elif transaction.type == "planned" %}
+                            <p><a class="btn btn-outline-dark" id="details" href="{% url "financeAwareness:planned_details" transaction.id %}">{{transaction.name}}</a></p>
                             {% else %}
                             <p><a class="btn btn-outline-dark" id="details" href="{% url "financeAwareness:transaction_details" transaction.id %}">{{transaction.name}}</a></p>
                             {% endif %}
@@ -32,10 +47,16 @@
                         <div class="card-body">
                             <p>Data: {{transaction.date | naturalday}}</p>
                             <p>Wartość: {{transaction.value}}</p>
+                            <div class="d-grid gap-2">
                             {% if transaction.type == "transfer" %}
                             <a class="btn btn-secondary" href="{% url "financeAwareness:transfer_form_update" transaction.id %}">Edycja</a>
-                            <a class="btn btn-danger" href="{% url "financeAwareness:transfer_form_delete" transaction.id %}">Usuń</a>  
+                            <a class="btn btn-danger" href="{% url "financeAwareness:transfer_form_delete" transaction.id %}">Usuń</a>                           
+                            {% elif transaction.type == "recurringIncome" or transaction.type == "recurringExpense" %}
+                            <a class="btn btn-secondary" href="{% url "financeAwareness:recurring_form_add" transaction.id %}">Dokonaj transakcji</a>
+                            {% elif transaction.type == "planned" %}
+                            <a class="btn btn-secondary" href="{% url "financeAwareness:planned_form_add" transaction.id %}">Dokonaj transakcji</a>
                             {% endif %}
+                            </div>
                         </div>
                     </div>
                 </div> 

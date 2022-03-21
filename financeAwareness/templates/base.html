@@ -30,6 +30,7 @@
                       </button>                              
                     <div class="collapse navbar-collapse justify-content-center" id="navbarNav">               
                         <ul class="navbar-nav">
+                            {% if request.user.is_authenticated %}   
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url "financeAwareness:transactions" %}">Transakcje</a>
                             </li>
@@ -51,13 +52,13 @@
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url "financeAwareness:planned" %}">Planuj wydatki</a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url "financeAwareness:password_change" %}">Zmiana hasła</a>
-                            </li>
-                            {% if request.user.is_authenticated %}                   
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url "financeAwareness:logout" %}">Wyloguj</a>
-                            </li>    
+                            <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Opcje</a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="{% url "financeAwareness:password_change" %}">Zmiana hasła</a></li>
+                            <li><a class="dropdown-item" href="{% url "financeAwareness:logout" %}">Wyloguj</a></li>
+                            </ul>                          
+                            </li>   
                             {% else %}
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url "financeAwareness:login" %}">Zaloguj</a>
@@ -73,7 +74,7 @@
         <div class="container min-vh-100 p-3">
             {% if request.user.is_authenticated %}
             <div class="container-fluid ">
-                <div class="row mb-3 g-4">
+                <div class="row row-cols-1 row-cols-lg-3 mb-3 g-4">
                     <div class="col" >
                         <div class="card text-center">
                             <div class="card-header " >

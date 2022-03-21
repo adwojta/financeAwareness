@@ -29,8 +29,6 @@ function SearchSubcategories(element){
         data:{'category':category},
         success: function(response,status,jqXHR){
             if(jqXHR.status=="200"){
-                console.log($(element).nextAll('select').first())
-                console.log(element)
                 $(element).nextAll('select').first().empty()                                  
             data = JSON.parse(response['subcategories'])                 
             $.each(data, function(i, item){
@@ -50,15 +48,12 @@ function SearchSubcategories(element){
 
 function SearchCategories(element){
     var transaction_type = $('#id_transaction_type').val()
-    console.log(transaction_type)
     $.ajax({
         type:'get',
         url:"{% url 'financeAwareness:ajaxCategories' %}",
         data:{'transaction_type':transaction_type},
         success: function(response,status,jqXHR){
             if(jqXHR.status=="200"){
-                console.log($(element).nextAll('select').first())
-                console.log(element)
                 $(element).nextAll('select').first().empty()                                  
             data = JSON.parse(response['categories'])                 
             $.each(data, function(i, item){
@@ -109,7 +104,9 @@ function SearchCategories(element){
             {{search_form.tags.label_tag}}   
             {{search_form.tags}}
             {% csrf_token %}
+            <div class="d-grid">
             <input class="btn btn-primary" type="submit" value="Szukaj">
+            </div>
         </form>
         </div>
     </div>

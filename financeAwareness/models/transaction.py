@@ -12,21 +12,20 @@ def upload(instance,filename):
 
 class Transaction(models.Model):
     types=(('income','Przychód'),('expense','Wydatek'),('planned','Zaplanowana'),('recurringExpense','Stały wydatek'),('recurringIncome','Stały przychód'),('transfer','Transfer'))
-    reccuringTypes=(('month','Miesiąc'),('quarter','Kwartał'),('year','Rok'),('week','tydzień'))
+    reccuringTypes=(('month','Miesiąc'),('quarter','Kwartał'),('year','Rok'),('week','Tydzień'))
 
     name = models.CharField(max_length=100)
-    user_id = models.ForeignKey(User,on_delete=models.CASCADE,related_name="transactions")
-    account_id = models.ForeignKey(Account,on_delete=models.CASCADE,related_name="transactions")    
+    user = models.ForeignKey(User,on_delete=models.CASCADE,related_name="transactions")
+    account = models.ForeignKey(Account,on_delete=models.CASCADE,related_name="transactions")    
     value = models.FloatField()
     description = models.TextField(null=True,blank=True)
     date = models.DateField()  
-    type = models.CharField(choices=types,max_length=20)
+    type = models.CharField(choices=types,max_length=16)
     tags = models.ManyToManyField(Tag,related_name='tags',blank=True)
 
-    #Transfer field
     transfer_account = models.ForeignKey(Account,on_delete=models.CASCADE,related_name="transfer",null=True,blank=True)
 
-    reccuring_type = models.CharField(choices=reccuringTypes,max_length=20,null=True)
+    reccuring_type = models.CharField(choices=reccuringTypes,max_length=7,null=True)
     image = models.ImageField(upload_to=upload,blank=True,null=True)
 
     class Meta:

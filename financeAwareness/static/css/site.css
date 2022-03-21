@@ -19,3 +19,6 @@
 #expense{
     background-color: rgba(240, 105, 105, 0.644);
 }
+ul {
+    list-style-type: none;
+}

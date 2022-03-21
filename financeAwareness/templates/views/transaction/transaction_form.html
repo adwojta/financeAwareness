@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %} Dodaj Transakcje {% endblock %}
+{% block title %} {{title}} {% endblock %}
 {% block content %}
 <script>       
     $( function() {
@@ -15,31 +15,42 @@
 </script>
 <div class="card">
     <div class="card-header">
-        <h3>Dodaj transakcje</h3>
+        <h3>{{title}}</h3>
     </div>
     <div class="card-body">
-        <form action="#" method="post" enctype="multipart/form-data">   
+        <form action="#" method="post" enctype="multipart/form-data">
+        <div class="row">
+        <div class="col">   
             {{transaction_form.as_p}}
+            {%if update%}
+            <p><label for="id_is_cash">Usunąć zdjęcie?</label> <input type="checkbox" name="image-clear" class="form-check-input" id="id_image-clear"></p>
+            {% endif %}
             {% csrf_token %}
             <div id='items'>
             {% for transaction_item_form in transaction_item_forms %}
-            <div style="background-color: rgb(188, 210, 224);border-radius: 5px; margin-bottom: 1em;" id='item_1' class = 'transaction_item'>
-                <p><input class="btn btn-secondary" type="button" onclick="delete_item(this)" value="Usuń element" style="display: none;"></p>
+            <div style="background-color: rgb(188, 210, 224);border-radius: 5px; margin-bottom: 1em;" id='item_1' class='transaction_item'>
+                <input class="btn btn-secondary" type="button" onclick="delete_item(this)" value="Usuń element" style="width:100%">
                 {{transaction_item_form.item_name.label_tag}}
                 {{transaction_item_form.item_name}}
-                {{transaction_item_form.category_id.label_tag}}  
-                {{transaction_item_form.category_id}}
+                {{transaction_item_form.category.label_tag}}  
+                {{transaction_item_form.category}}
                 {{transaction_item_form.subcategory.label_tag}}
                 {{transaction_item_form.subcategory}}
                 {{transaction_item_form.item_value.label_tag}}
                 {{transaction_item_form.item_value}}
+                {% if is_not_planned %}
                 {{transaction_item_form.is_planned.label_tag}}
                 {{transaction_item_form.is_planned}}
+                {% endif %}
             </div>          
             {% endfor %}
             </div>
-            <input class="btn btn-secondary" type="button" onclick="add_item()" value="Dodaj element">
-            <input class="btn btn-primary" type="submit" value="Dodaj transakcje">
+            </div>
+            </div>
+            <div class="row">
+            <div class="col"><input class="btn btn-secondary" type="button" onclick="add_item()" value="Dodaj element" style="width:100%"></div>
+            <div class="col"><input class="btn btn-primary" type="submit" value="Wyślij" style="width:100%"></div>
+            </div>                 
         </form>
         </div>
     </div>

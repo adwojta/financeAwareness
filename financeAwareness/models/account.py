@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 
 class Account(models.Model):
     name = models.CharField(max_length=100)
-    user_id = models.ForeignKey(User,on_delete=models.CASCADE,related_name="accounts")
+    user = models.ForeignKey(User,on_delete=models.CASCADE,related_name="accounts")
     value = models.FloatField(default=0)
     is_cash = models.BooleanField()
     is_saving_goal = models.BooleanField(null=True,blank=True,default=False)
@@ -15,6 +15,7 @@ class Account(models.Model):
 
     class Meta:
         db_table = 'account'
+        ordering = ('-accomplished_date',)
 
     def __str__(self):
         return self.name

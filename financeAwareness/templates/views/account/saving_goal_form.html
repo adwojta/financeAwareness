@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %} Dodaj cel {% endblock %}
+{% block title %} {{title}} {% endblock %}
 {% block content %}
 <script>       
     $( function() {
@@ -11,17 +11,19 @@
     firstDay: 1
     });
 } );
-
 </script>
 <div class="card">
     <div class="card-header">
-        <h3>Dodaj cel</h3>
+        <h3>{{title}}</h3>
     </div>
     <div class="card-body">
         <form action="" method="post">
             {{saving_goal_form.as_p}}
             {% csrf_token %}
-            <p><input class="btn btn-primary"type="submit" value="Dodaj"></p>
+            <div class="d-grid gap-2">
+            <input class="btn btn-primary"type="submit" value="Wyślij">
+            <a class="btn btn-secondary" href="{% url "financeAwareness:accounts" %}">Wróć</a>
+            </div>
         </form>
     </div>
 </div>

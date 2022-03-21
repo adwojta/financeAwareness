@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %} {{title}} {% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3>{{title}}</h3>
+    </div>
+    <div class="card-body">
+        <form action="" method="post">
+            {{form.as_p}}
+            {% csrf_token %}
+            <div class="d-grid gap-2">
+            <input class="btn btn-primary" type="submit" value="Wyślij">
+            {% if type == 'category_form' %}
+            <a class="btn btn-secondary" href="{% url "financeAwareness:categories" %}">Wróć</a>
+            {% elif type == 'category' %}
+            <a class="btn btn-secondary" href="{% url "financeAwareness:category_details" category_id %}">Wróć</a>
+            {% elif type == 'tag' %}
+            <a class="btn btn-secondary" href="{% url "financeAwareness:tags" %}">Wróć</a>
+            {% elif type == 'account' %}
+            <a class="btn btn-secondary" href="{% url "financeAwareness:accounts" %}">Wróć</a>
+            {% endif %}
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

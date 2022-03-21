@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %} Transakcja {% endblock %}
-
+{% block title %} {{title}} {% endblock %}
 
 {% block content %}
 <div class="card">
@@ -9,22 +8,36 @@
         <p>{{transaction.name}}</p>
         <p>Data: {{transaction.date}}</p>
         <p>Wartość: {{transaction.value}}</p>
+        <div class="d-grid gap-2">   
         {%if transaction.image %}
-        <img src = '{{transaction.image.url}}' class="img-thumbnail" style="max-height: 500px" alt=""/>
-        {%endif%}    
-        <p><a class="btn btn-primary" href="{% url "financeAwareness:transactions" %}">Powrót</a>
+        <img src = '{{transaction.image.url}}' class="img-thumbnail mx-auto d-block" style="max-height: 500px;max-width: 500px" alt=""/>
+        {%endif%}     
+        {% if transaction.type == "recurringIncome" or transaction.type == "recurringExpense" %}
+        <a class="btn btn-primary" href="{% url "financeAwareness:recurrings" %}">Powrót</a>
+        <a class="btn btn-secondary" href="{% url "financeAwareness:recurring_form_update" transaction.id %}">Edycja</a>
+        <a class="btn btn-danger" href="{% url "financeAwareness:recurring_form_delete" transaction.id %}">Usuń</a>
+        {% elif transaction.type == "planned" %}
+        <a class="btn btn-primary" href="{% url "financeAwareness:planned" %}">Powrót</a>
+        <a class="btn btn-secondary" href="{% url "financeAwareness:planned_details_pdf" transaction.id %}">Generuj pdf</a>
+        <a class="btn btn-secondary" href="{% url "financeAwareness:planned_form_update" transaction.id %}">Edycja</a>
+        <a class="btn btn-danger" href="{% url "financeAwareness:planned_form_delete" transaction.id %}">Usuń</a> 
+        {% else %}
+        <a class="btn btn-primary" href="{% url "financeAwareness:transactions" %}">Powrót</a>
         <a class="btn btn-secondary" href="{% url "financeAwareness:transaction_form_update" transaction.id %}">Edycja</a>
-        <a class="btn btn-danger" href="{% url "financeAwareness:transaction_form_delete" transaction.id %}">Usuń</a></p>       
+        <a class="btn btn-danger" href="{% url "financeAwareness:transaction_form_delete" transaction.id %}">Usuń</a>
+        {% endif %}  
+        </div>
     </div>
     <div class="card-body">
-        {% for item in items %}
+        {% for item,subcategory in context %}
         <div class="card">
             <div class="card-header">
                 <p>{{item.item_name}}</p>
             </div>
             <div class="card-body">
                 <div class="item">                                       
-                    <p>Kategoria:{{item.category_id}}</p>
+                    <p>Kategoria: {{item.category}}</p>
+                    <p>Podkategoria: {{subcategory}}</p>
                     <p>Wartość: {{item.item_value}}</p>
                     {% if item.is_planned %}
                     <p>Zaplanowany:<input type="checkbox" class="form-check" name="is_planned" checked disabled></p>

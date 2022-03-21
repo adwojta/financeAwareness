@@ -6,7 +6,9 @@
 <div class="card text-center" >
     <div class="card-header">
         <h1>Tagi</h1>
-        <a class="btn btn-primary" href="{% url "financeAwareness:new_tag" %}">Dodaj</a>
+        <div class="d-grid">
+        <a class="btn btn-primary" href="{% url "financeAwareness:new_tag" %}">Dodaj tag</a>
+        </div>
     </div>
     <div class="card-body">
         {% for tag in tags %}
@@ -16,8 +18,10 @@
                 {{tag.name}}
             </div>
             <div class="card-body">
-                <a class="btn btn-secondary" href="{% url "financeAwareness:tag_form_update" tag.id %}">Zmiań</a>
-                <a class="btn btn-danger" href="{% url "financeAwareness:tag_form_delete" tag.id %}">Usuń</a>
+                <div class="d-grid gap-2">
+                    <a class="btn btn-secondary" href="{% url "financeAwareness:tag_form_update" tag.id %}">Zmiań</a>
+                    <a class="btn btn-danger" href="{% url "financeAwareness:tag_form_delete" tag.id %}">Usuń</a>
+                </div>               
             </div>
         </div>
         {% endfor %}

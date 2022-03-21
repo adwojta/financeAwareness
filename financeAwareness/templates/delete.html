@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %} {{title}} {% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3>{{title}}</h3>
+    </div>
+    <div class="card-body">
+        <form action="" method="post">
+            {% csrf_token %}           
+            {% if delete_type == 'Transaction' %}
+            <p>Czy na pewno chcesz usunać transakcje?</p>
+            <input class="btn btn-primary" type="submit" value="Tak">
+            <a class="btn btn-secondary" href="{% url "financeAwareness:transaction_details" id %}">Nie</a>
+            {% elif delete_type == 'Reccuring' %}
+            <p>Czy na pewno chcesz usunać stałą transakcje?</p>
+            <input class="btn btn-primary" type="submit" value="Tak">
+            <a class="btn btn-secondary" href="{% url "financeAwareness:recurring_details" id %}">Nie</a>
+            {% elif delete_type == 'Planned' %}
+            <p>Czy na pewno chcesz usunać liste zakupową?</p>
+            <input class="btn btn-primary" type="submit" value="Tak">
+            <a class="btn btn-secondary" href="{% url "financeAwareness:planned_details" id %}">Nie</a>
+            {% elif delete_type == 'Account' %}
+            <p>Czy na pewno chcesz usunać konto?</p>
+            <input class="btn btn-primary" type="submit" value="Tak">
+            <a class="btn btn-secondary" href="{% url "financeAwareness:accounts" %}">Nie</a>
+            {% elif delete_type == 'Goal' %}
+            <p>Czy na pewno chcesz usunać cel?</p>
+            <input class="btn btn-primary" type="submit" value="Tak">
+            <a class="btn btn-secondary" href="{% url "financeAwareness:accounts" %}">Nie</a>
+            {% elif delete_type == 'Transfer' %}
+            <p>Czy na pewno chcesz usunać transfer?</p>
+            <input class="btn btn-primary" type="submit" value="Tak">
+            <a class="btn btn-secondary" href="{% url "financeAwareness:transactions" %}">Nie</a>
+            {% elif delete_type == 'Tag' %}
+            <p>Czy na pewno chcesz usunać tag?</p>
+            <input class="btn btn-primary" type="submit" value="Tak">
+            <a class="btn btn-secondary" href="{% url "financeAwareness:tags" %}">Nie</a>
+            {% elif delete_type == 'Category' %}
+            <p>Czy na pewno chcesz usunać kategorie?</p>
+            <input class="btn btn-primary" type="submit" value="Tak">
+            <a class="btn btn-secondary" href="{% url "financeAwareness:categories" %}">Nie</a>
+            {% elif delete_type == 'Subcategory' %}
+            <p>Czy na pewno chcesz usunać podkategorie?</p>
+            <input class="btn btn-primary" type="submit" value="Tak">
+            <a class="btn btn-secondary" href="{% url "financeAwareness:category_details" id %}">Nie</a>
+            {%endif%}
+        </form>
+    </div>
+</div>
+{% endblock %}

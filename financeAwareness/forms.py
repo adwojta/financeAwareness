@@ -15,7 +15,7 @@ class LoginForm(forms.Form):
     username = forms.CharField()
     password = forms.CharField(widget=forms.PasswordInput)
 
-class registerForm(UserCreationForm):
+class RegisterForm(UserCreationForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for name in self.fields.keys():
@@ -24,26 +24,26 @@ class registerForm(UserCreationForm):
         model = User
         fields = ('username','first_name','last_name','email','password1','password2')
 
-
 class TransactionForm(forms.ModelForm):
     def __init__(self,User, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["account_id"] = forms.ModelChoiceField(queryset=Account.objects.filter(user_id=User,is_saving_goal=False))
+        self.fields["account"] = forms.ModelChoiceField(queryset=Account.objects.filter(user=User,is_saving_goal=False))
         self.fields["date"] = forms.DateField(widget=forms.DateInput())
         self.fields['value'] = forms.FloatField(widget=forms.NumberInput(),initial=0)
-        self.fields["tags"] = forms.ModelMultipleChoiceField(queryset=Tag.objects.filter(user_id=User) ,widget=forms.CheckboxSelectMultiple)
+        self.fields["tags"] = forms.ModelMultipleChoiceField(queryset=Tag.objects.filter(user=User) ,widget=forms.CheckboxSelectMultiple)
         self.fields["image"] = forms.ImageField(widget=forms.FileInput)
 
         #Labals
         self.fields["name"].label = "Nazwa transakcji"
-        self.fields["account_id"].label = "Konto"
+        self.fields["account"].label = "Konto"
         self.fields["value"].label = "Wartość"
         self.fields["description"].label = "Opis"
         self.fields["date"].label = "Data transakcji"
         self.fields["image"].label = "Zdjęcie"
+        self.fields["tags"].label = "Tagi"
 
         self.fields["name"].widget.attrs.update({'class': 'form-control',}) 
-        self.fields["account_id"].widget.attrs.update({'class': 'form-control',}) 
+        self.fields["account"].widget.attrs.update({'class': 'form-control',}) 
         self.fields["value"].widget.attrs.update({'class': 'form-control',}) 
         self.fields["description"].widget.attrs.update({'class': 'form-control',}) 
         self.fields["date"].widget.attrs.update({'class': 'form-control',})
@@ -55,25 +55,26 @@ class TransactionForm(forms.ModelForm):
 
     class Meta:
         model = Transaction
-        fields = ('name','account_id','value','description','date','tags','image')
+        fields = ('name','account','value','description','date','tags','image')
         
 class RecurringForm(forms.ModelForm):
     def __init__(self,User, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["account_id"] = forms.ModelChoiceField(queryset=Account.objects.filter(user_id=User,is_saving_goal=False))
+        self.fields["account"] = forms.ModelChoiceField(queryset=Account.objects.filter(user=User,is_saving_goal=False))
         self.fields["date"] = forms.DateField(widget=forms.DateInput())
         self.fields['value'] = forms.FloatField(widget=forms.NumberInput(),initial=0)
-        self.fields["tags"] = forms.ModelMultipleChoiceField(queryset=Tag.objects.filter(user_id=User) ,widget=forms.CheckboxSelectMultiple)
+        self.fields["tags"] = forms.ModelMultipleChoiceField(queryset=Tag.objects.filter(user=User) ,widget=forms.CheckboxSelectMultiple)
 
         #Labals
         self.fields["name"].label = "Nazwa transakcji"
-        self.fields["account_id"].label = "Konto"
+        self.fields["account"].label = "Konto"
         self.fields["value"].label = "Wartość"
         self.fields["description"].label = "Opis"
         self.fields["date"].label = "Data następnej transakcji"
+        self.fields["tags"].label = "Tagi"
 
         self.fields["name"].widget.attrs.update({'class': 'form-control',}) 
-        self.fields["account_id"].widget.attrs.update({'class': 'form-control',}) 
+        self.fields["account"].widget.attrs.update({'class': 'form-control',}) 
         self.fields["value"].widget.attrs.update({'class': 'form-control',}) 
         self.fields["description"].widget.attrs.update({'class': 'form-control',}) 
         self.fields["date"].widget.attrs.update({'class': 'form-control',})
@@ -84,7 +85,7 @@ class RecurringForm(forms.ModelForm):
 
     class Meta:
         model = Transaction
-        fields = ('name','account_id','value','description','date','tags','reccuring_type')
+        fields = ('name','account','value','description','date','tags','reccuring_type')
 
 class TransactionItemForm(forms.ModelForm):
 
@@ -99,58 +100,53 @@ class TransactionItemForm(forms.ModelForm):
             income = False
             
         if kwargs.get('instance'):
-            category = kwargs['instance'].category_id
+            category = kwargs['instance'].category
             
             if category.master_category:             
                 self['subcategory'].initial = category
                 self['subcategory'].field =forms.ModelChoiceField(
-                    queryset=Category.objects.filter(user_id=User,master_category=category.master_category,income=income),initial=category,
-                    widget=forms.Select(attrs={'class': 'form-control form-control-sm',}),required=False)
+                    queryset=Category.objects.filter(user=User,master_category=category.master_category,is_income=income),initial=category,
+                    widget=forms.Select(attrs={'class': 'form-control form-control-sm'}),required=False)
                 
                 category = category.master_category
 
-            self.initial["category_id"] = category
-
-
-            self.fields["category_id"] = forms.ModelChoiceField(
-                queryset=Category.objects.filter(user_id=User,master_category=None,income=income),initial=category,
-                widget=forms.Select(attrs={'onclick':'getSubcategories(this)',}))
+            self.initial["category"] = category
+            self.fields["category"] = forms.ModelChoiceField(
+                queryset=Category.objects.filter(user=User,master_category=None,is_income=income),initial=category,
+                widget=forms.Select(attrs={'onclick':'getSubcategories(this)'}))
             
         else:
-            self.fields["category_id"] = forms.ModelChoiceField(
-                queryset=Category.objects.filter(user_id=User,master_category=None,income=income),
+            self.fields["category"] = forms.ModelChoiceField(
+                queryset=Category.objects.filter(user=User,master_category=None,is_income=income),
                 widget=forms.Select(attrs={'onclick':'getSubcategories(this)'}))
         
-        self.fields["item_value"] = forms.FloatField(widget=forms.NumberInput(attrs={'onchange':'change_transaction_value()'}),initial=0,min_value=0)
-        self.fields["is_planned"] = forms.ChoiceField(choices=((True,"Tak"),(False,"Nie")), widget=forms.Select(),required=True)
         self.fields["item_value"] = forms.FloatField(widget=forms.NumberInput(attrs={'onchange':'change_transaction_value()'}),initial=0,min_value=0)
         self.fields["is_planned"] = forms.ChoiceField(choices=((True,"Tak"),(False,"Nie")), widget=forms.Select(),required=True)
 
         #Labals
         self.fields["item_name"].label = "Nazwa produktu"
-        self.fields["category_id"].label = "Nazwa kategorii"
+        self.fields["category"].label = "Nazwa kategorii"
         self.fields["item_value"].label = "Wartość"
         self.fields["is_planned"].label = "Planowany?"
-
 
         for name in self.fields.keys():
             self.fields[name].widget.attrs.update({'class': 'form-control form-control-sm',})
 
     class Meta:       
         model = TransactionItem
-        fields = ('item_name','category_id','item_value','is_planned')    
+        fields = ('item_name','category','item_value','is_planned')    
 
 class CategoryForm(forms.ModelForm):
     def __init__(self,User, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["name"].label = "Nazwa kategorii"
+        self.fields["name"].label = "Nazwa"
 
         for name in self.fields.keys():
             self.fields[name].widget.attrs.update({'class': 'form-control',})   
 
     class Meta:
         model = Category
-        exclude = ('user_id','income','master_category')
+        exclude = ('user','is_income','master_category')
 
 class AccountForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
@@ -187,33 +183,32 @@ class SavingGoalForm(forms.ModelForm):
         model = Account
         fields = ('name','due_date','goal_value','is_active_saving_goal')
 
-
 class TransferForm(forms.ModelForm):
-    def __init__(self,User,saving_goal=False, *args, **kwargs):
+    def __init__(self,User,saving_goal=False,goal_id=0, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if saving_goal:
-            self.fields["transfer_account"] = forms.ModelChoiceField(queryset=Account.objects.filter(user_id=User,is_saving_goal=False))
+            self.fields["transfer_account"] = forms.ModelChoiceField(queryset=Account.objects.filter(user=User,is_saving_goal=False))
+            self.fields["account"] = forms.ModelChoiceField(queryset=Account.objects.filter(id=goal_id))
         else:
-            self.fields["transfer_account"] = forms.ModelChoiceField(queryset=Account.objects.filter(user_id=User,accomplished_date=None))       
+            self.fields["transfer_account"] = forms.ModelChoiceField(queryset=Account.objects.filter(user=User,accomplished_date=None))
+            self.fields["account"] = forms.ModelChoiceField(queryset=Account.objects.filter(user=User,accomplished_date=None))       
         self.fields["date"] = forms.DateField(widget=forms.DateInput())
-        self.fields["account_id"] = forms.ModelChoiceField(queryset=Account.objects.filter(user_id=User,accomplished_date=None))
         
-
         for name in self.fields.keys():
             self.fields[name].widget.attrs.update({'class': 'form-control',})
 
         self.fields["value"].label = "Wartość"
         self.fields["date"].label = "Data"
-        self.fields["account_id"].label = "Konto"
+        self.fields["account"].label = "Konto"
         self.fields["transfer_account"].label = "Konto docelowe"
 
         if saving_goal:
             self.fields["value"].widget.attrs['readonly'] = True
-            self.fields["account_id"].widget.attrs['readonly'] = True
+            self.fields["account"].widget.attrs['readonly'] = True
 
     class Meta:
         model = Transaction
-        fields = ('value','date','account_id','transfer_account')
+        fields = ('value','date','account','transfer_account')
 
 
 class TagForm(forms.ModelForm):
@@ -229,7 +224,7 @@ class TagForm(forms.ModelForm):
 class SearchForm(forms.Form):
     def __init__(self,user, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['tags'] = forms.ModelMultipleChoiceField(queryset=Tag.objects.filter(user_id=user) ,widget=forms.CheckboxSelectMultiple,required=False)
+        self.fields['tags'] = forms.ModelMultipleChoiceField(queryset=Tag.objects.filter(user=user) ,widget=forms.CheckboxSelectMultiple,required=False)
         
     choices =((True,'Przychód'),(False,'Wydatek'),(None,'-------'))
     date_from = forms.DateField(required=False)
@@ -251,27 +246,27 @@ class SearchForm(forms.Form):
     planned.widget.attrs.update({'class': 'form-control',})
 
 class DateForm(forms.Form):
-
     def __init__(self,user=None,date_from=(datetime.now()+relativedelta(day=1)),date_to=(datetime.now()+relativedelta(months=1, day=1, days=-1)), *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['date_from'] = forms.DateField(initial=date_from)
         self.fields['date_to'] = forms.DateField(initial=date_to)
         self.fields['date_from'].label = 'Od'
         self.fields['date_to'].label = 'Do'
+        self.fields['date_from'].widget.attrs.update({'class': 'form-control'})
+        self.fields['date_to'].widget.attrs.update({'class': 'form-control'})
         if user:
-            self.fields["category_expense"] = forms.ModelChoiceField(queryset=Category.objects.filter(user_id=user,master_category=None, income=False))
-            self.fields["category_income"] = forms.ModelChoiceField(queryset=Category.objects.filter(user_id=user,master_category=None, income=True) )
+            self.fields["category_expense"] = forms.ModelChoiceField(queryset=Category.objects.filter(user=user,master_category=None, is_income=False))
+            self.fields["category_income"] = forms.ModelChoiceField(queryset=Category.objects.filter(user=user,master_category=None, is_income=True) )
             self.fields["category_expense"].required = False
             self.fields["category_income"].required = False
             self.fields["category_expense"].label = 'Kategoria wydatki'
             self.fields["category_income"].label = 'Kategoria przychody'
-            self.fields["category_expense"].widget.attrs.update({'class': 'form-control',})
-            self.fields["category_income"].widget.attrs.update({'class': 'form-control',})
+            self.fields["category_expense"].widget.attrs.update({'class': 'form-control'})
+            self.fields["category_income"].widget.attrs.update({'class': 'form-control'})
 
     date_from = forms.DateField()
     date_to = forms.DateField()
-    category_expense = forms.Select()
-    category_income = forms.Select()
+    category_expense = None
+    category_income = None
 
-    date_from.widget.attrs.update({'class': 'form-control',})
-    date_to.widget.attrs.update({'class': 'form-control',})
+    

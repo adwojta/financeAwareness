@@ -6,17 +6,18 @@ from dateutil.relativedelta import relativedelta
 
 #recurring
 class RecurringListView(AbstractListView):
-    success_view = 'views/recurring/recurrings.html'
-    types = ['recurringExpense','recurringIncome']
+    type = ['recurringExpense','recurringIncome']
+    title='Stałe transakcje'
 
 class RecurringDetailView(AbstractDetailView):
     redirect_view = 'financeAwareness:recurrings'
-    success_view = 'views/recurring/recurring_details.html'
+    title = 'Stała transakcja'
 
 class CreateRecurringIncome(AbstractCreateTransaction):
     type = 'recurringIncome'
     category_type = 'income'
-    get_view = 'views/recurring/recurring_form.html'
+    title = 'Dodaj stały przychód'
+    is_not_planned = False
     form = RecurringForm
 
     def post(self, request,is_planned=True, *args, **kwargs):
@@ -26,7 +27,8 @@ class CreateRecurringIncome(AbstractCreateTransaction):
 class CreateRecurringExpense(AbstractCreateTransaction):
     type = 'recurringExpense'
     category_type = 'expense'
-    get_view = 'views/recurring/recurring_form.html'
+    title = 'Dodaj stały wydatek'
+    is_not_planned = False
     form = RecurringForm
 
     def post(self, request,is_planned=True, *args, **kwargs):
@@ -34,7 +36,8 @@ class CreateRecurringExpense(AbstractCreateTransaction):
         return redirect('financeAwareness:recurrings')
 
 class RecurringUpdate(AbstractUpdateTransaction):
-    get_view = 'views/recurring/recurring_update.html'
+    title = 'Zaktualizuj stałą transakcje'
+    is_not_planned = False
     form = RecurringForm
 
     def form_valid(self, request, *args, **kwargs):
@@ -47,11 +50,13 @@ class RecurringUpdate(AbstractUpdateTransaction):
 
 class RecurringDelete(AbstractDelete):
     redirect_view = 'financeAwareness:recurrings'
-    get_view = 'views/recurring/recurring_delete.html'
+    model = Transaction
+    delete_type = "Reccuring"
+    title = "Usuń stałą transakcje"
 
 class RecurringAdd(AbstractUpdateTransaction):
     form = TransactionForm
-    get_view = 'views/recurring/recurring_add.html'
+    title = 'Dodaj stałą transakcje'
     
     def post(self, request, *args, **kwargs):
         super().post(request,is_planned=True)
@@ -62,8 +67,7 @@ class RecurringAdd(AbstractUpdateTransaction):
 
         recurring_transaction = Transaction.objects.get(id=self.new_transaction.id)
         self.new_transaction.id = None
-        account = self.new_transaction.account_id
-
+        account = self.new_transaction.account
         if self.items_valid:
             if recurring_transaction.type =='recurringExpense':
                 account.value = account.value - self.new_transaction.value

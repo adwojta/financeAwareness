@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% load humanize %}
-{% block title %} Transakcje {% endblock %}
+{% block title %} Raporty {% endblock %}
 
 {% block content %}
 
@@ -84,13 +84,19 @@
                 data: [{%for data in data_c_e %} {{data}} ,{% endfor %}],
                 backgroundColor: [
                         'rgba(240, 105, 105, 0.644)',
-                        'rgba(115, 255, 102, 0.596)' 
-                        
-  
+                        'rgba(115, 255, 102, 0.596)',
+                        'rgba(5, 143, 255, 0.774)',
+                        'rgba(241, 241, 107, 0.774)',
+                        'rgba(255, 5, 213, 0.774)',
+                        'rgba(5, 247, 255, 0.774)', 
                     ],
                 borderColor: [
                     'rgba(240, 105, 105, 0.644)',
-                    'rgba(115, 255, 102, 0.596)' 
+                    'rgba(115, 255, 102, 0.596)',
+                    'rgba(5, 143, 255, 0.774)',
+                    'rgba(241, 241, 107, 0.774)',
+                    'rgba(255, 5, 213, 0.774)',
+                    'rgba(5, 247, 255, 0.774)', 
                 ],
             }],
              
@@ -152,13 +158,19 @@
                 data: [{%for data in data_tags %} {{data}} ,{% endfor %}],
                 backgroundColor: [
                         'rgba(240, 105, 105, 0.644)',
-                        'rgba(115, 255, 102, 0.596)' 
-                        
-  
+                        'rgba(115, 255, 102, 0.596)',
+                        'rgba(5, 143, 255, 0.774)',
+                        'rgba(241, 241, 107, 0.774)',
+                        'rgba(255, 5, 213, 0.774)',
+                        'rgba(5, 247, 255, 0.774)', 
                     ],
                 borderColor: [
                     'rgba(240, 105, 105, 0.644)',
-                    'rgba(115, 255, 102, 0.596)' 
+                    'rgba(115, 255, 102, 0.596)',
+                    'rgba(5, 143, 255, 0.774)',
+                    'rgba(241, 241, 107, 0.774)',
+                    'rgba(255, 5, 213, 0.774)',
+                    'rgba(5, 247, 255, 0.774)', 
                 ],
             }],
              
@@ -185,7 +197,7 @@
         <div class="col">
             <div class="card">
                 <div class="card-header">
-                <a class="btn btn-primary" href="{% url "financeAwareness:expense_income_details" %}">Raport Wydatki i przychody</a>       
+                <a class="btn btn-primary" href="{% url "financeAwareness:report_expense_income_details" %}">Raport Wydatki i przychody</a>       
                 </div>
                 <div class="card-body">
                 <canvas id="expense_income_chart"></canvas>
@@ -193,11 +205,11 @@
             </div>
         </div>       
     </div>  
-    <div class="row">
+    <div class="row row-cols-1 row-cols-lg-2">
         <div class="col">
             <div class="card">
                 <div class="card-header">
-                <a class="btn btn-primary" href="{% url "financeAwareness:tags_details" %}">Raport tagów</a> 
+                <a class="btn btn-primary" href="{% url "financeAwareness:report_tags_details" %}">Raport tagów</a> 
                 </div>
                 <div class="card-body">
                 <canvas id="tags_chart"></canvas>
@@ -207,7 +219,7 @@
         <div class="col">
             <div class="card">
                 <div class="card-header">
-                <a class="btn btn-primary" href="{% url "financeAwareness:category_details" %}">Raport kategorii</a>        
+                <a class="btn btn-primary" href="{% url "financeAwareness:report_category_details" %}">Raport kategorii</a>        
                 </div>
                 <div class="card-body">
                 <canvas id="category_expense_chart"></canvas>
@@ -216,11 +228,11 @@
         </div>
         
     </div>
-    <div class="row">
+    <div class="row row-cols-1 row-cols-lg-2">
         <div class="col">
             <div class="card">
                 <div class="card-header">
-                <a class="btn btn-primary" href="{% url "financeAwareness:planned_details" %}">Raport planowanych i nieplanowanych</a>       
+                <a class="btn btn-primary" href="{% url "financeAwareness:report_planned_details" %}">Raport planowanych i nieplanowanych</a>       
                 </div>
                 <div class="card-body">
                 <canvas id="planned_chart"></canvas>
@@ -230,7 +242,7 @@
         <div class="col">
             <div class="card">
                 <div class="card-header">
-                <a class="btn btn-primary" href="{% url "financeAwareness:recurring_details" %}">Raport stałych transakcji</a>        
+                <a class="btn btn-primary" href="{% url "financeAwareness:report_recurring_details" %}">Raport stałych transakcji</a>        
                 </div>
                 <div class="card-body">
                 <canvas id="recurring_expense_income_chart"></canvas>

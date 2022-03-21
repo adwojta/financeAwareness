@@ -6,9 +6,11 @@
     <div class="card text-center" >
         <div class="card-header">
             <h1>Kategoria {{category.name}}</h1>
-            <a class="btn btn-primary" href="{% url "financeAwareness:subcategory_form" category.id %}">Dodaj podkategorie</a>
-            <a class="btn btn-secondary" href="{% url "financeAwareness:category_form_update" category.id %}">Zmień</a>
-            <a class="btn btn-danger" href="{% url "financeAwareness:category_form_delete" category.id %}">Usuń</a>
+            <div class="d-grid gap-2">
+                <a class="btn btn-primary" href="{% url "financeAwareness:subcategory_form" category.id %}">Dodaj podkategorie</a>
+                <a class="btn btn-secondary" href="{% url "financeAwareness:category_form_update" category.id %}">Zmień</a>
+                <a class="btn btn-danger" href="{% url "financeAwareness:category_form_delete" category.id %}">Usuń</a>
+            </div>
         </div>
         <div class="row row-cols-2 mt-1 mb-1 g-4">
             {% for subcategory in subcategories %}
@@ -18,8 +20,10 @@
                         <h3>{{subcategory.name}}</h1>
                     </div> 
                         <div class="card-body">
+                            <div class="d-grid gap-2">
                             <a class="btn btn-secondary" href="{% url "financeAwareness:subcategory_form_update" subcategory.id %}">Zmień</a>
                             <a class="btn btn-danger" href="{% url "financeAwareness:subcategory_form_delete" subcategory.id %}">Usuń</a>
+                            </div>
                         </div>
                 </div>                     
             </div>

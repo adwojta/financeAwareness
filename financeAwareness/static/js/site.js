@@ -19,7 +19,7 @@ function add_item(){
 
     elem = document.getElementById(new_div_id);
     elem.children[0].children[0].style.display=""
-    getSubcategories($(elem).find('Select[name="category_id"]'))
+    getSubcategories($(elem).find('Select[name="category"]'))
 
     change_transaction_value()
     
