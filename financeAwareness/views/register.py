@@ -18,8 +18,6 @@ expense = (('Zakupy',('Sprzęt elektroniczny','Sport','Odzież','Obuwie','Prezen
 ('Rachunki',('Prąd','Czynsz','Woda','Telefon','Gaz','Ogrzewanie','Internet','Opłaty bankowe','Telewizja')),
 ('Jedzenie i picie',('Restauracje','Pieczywo','Warzywa','Owoce','Herbata','Kawa','Napoje gazowane','Słodycze')))
 
-
-
 def register(request):
     if request.method == 'POST':
         user_form = RegisterForm(request.POST)
@@ -28,26 +26,26 @@ def register(request):
             new_user = User.objects.latest('date_joined')
 
             #Creating basic categories for user
-            new = Category(income=False,user=new_user, name='Ogólna kategoria')
+            new = Category(is_income=False,user=new_user, name='Ogólna kategoria')
             new.save()            
             for category in expense:
-                new = Category(income=False,user=new_user, name=category[0])
+                new = Category(is_income=False,user=new_user, name=category[0])
                 new.save()
                 subcategories = category[1]
 
                 for subcategory in subcategories:                    
                     master = Category.objects.get(user=new_user, name=category[0], master_category=None)
-                    new = Category(income=False,user=new_user, name=subcategory, master_category=master)
+                    new = Category(is_income=False,user=new_user, name=subcategory, master_category=master)
                     new.save()
             
-            new = Category(income=True,user=new_user, name=income[0])
+            new = Category(is_income=True,user=new_user, name=income[0])
             new.save()
 
             subcategories = income[1]
             master = Category.objects.get(user=new_user,name=income[0])
 
             for subcategory in subcategories:           
-                new = Category(income=True, user=new_user, name=subcategory, master_category=master)
+                new = Category(is_income=True, user=new_user, name=subcategory, master_category=master)
                 new.save()
 
             #Creating basic accounts for user

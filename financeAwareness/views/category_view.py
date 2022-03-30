@@ -59,10 +59,10 @@ def subcategory_form(request,master_category):
     return render(request, 'form.html',{'form': form,'category_id':master_category,'title':title,'type':type})
 
 @login_required
-def category_form_update(request,category):
+def category_form_update(request,category_id):
     title = 'Zaktualizuj kategorie'
     type = 'category'   
-    category = get_object_or_404(Category,id=category)        
+    category = get_object_or_404(Category,id=category_id)        
     if request.user != category.user:
         return redirect('financeAwareness:transactions')       
     else:
@@ -71,9 +71,9 @@ def category_form_update(request,category):
             form = CategoryForm(data=request.POST,instance=category,User=request.user)
             if form.is_valid():
                 form.save()
-                return redirect('financeAwareness:category_details',category)
+                return redirect('financeAwareness:category_details',category.id)
 
-        return render(request, 'form.html',{'form':form,'category_id':category,'title':title,'type':type})
+        return render(request, 'form.html',{'form':form,'category_id':category.id,'title':title,'type':type})
 
 @login_required
 def subcategory_form_update(request,subcategory_id):

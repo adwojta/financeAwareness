@@ -10,7 +10,7 @@ register = template.Library()
 
 @register.simple_tag
 def available_funds(user):
-    sum = Account.objects.filter(user_id=user).aggregate(Sum('value'))
+    sum = Account.objects.filter(user_id=user,is_saving_goal=False).aggregate(Sum('value'))
 
     if not sum['value__sum']:
         sum['value__sum']='0.0'
@@ -19,7 +19,7 @@ def available_funds(user):
 
 @register.simple_tag
 def available_funds_cash(user):
-    sum = Account.objects.filter(user_id=user,is_cash=True).aggregate(Sum('value'))
+    sum = Account.objects.filter(user_id=user,is_cash=True,is_saving_goal=False).aggregate(Sum('value'))
 
     if not sum['value__sum']:
         sum['value__sum']='0.0'
@@ -28,7 +28,7 @@ def available_funds_cash(user):
 
 @register.simple_tag
 def available_funds_bank(user):
-    sum = Account.objects.filter(user_id=user,is_cash=False).aggregate(Sum('value'))
+    sum = Account.objects.filter(user_id=user,is_cash=False,is_saving_goal=False).aggregate(Sum('value'))
 
     if not sum['value__sum']:
         sum['value__sum']='0.0'

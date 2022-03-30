@@ -19,7 +19,7 @@ def account_form(request):
     type = 'account'
     if request.method == 'POST':
         form = AccountForm(data=request.POST)
-        if account_form.is_valid():
+        if form.is_valid():
             new_account = form.save(commit=False)
             new_account.user = request.user
             new_account.save()
@@ -41,7 +41,7 @@ def account_form_update(request,account_id):
             form = AccountForm(data=request.POST,instance=account)
             if form.is_valid():
                 new_account = form.save(commit=False)
-                new_account.user = request.user
+                new_account.user = request.user            
                 new_account.save()
                 return redirect('financeAwareness:accounts')
 
@@ -84,8 +84,8 @@ def saving_goal_form(request):
 @login_required
 def saving_goal_form_update(request,account_id):
     title = 'Zaktualizuj cel'
-    saving_goal = get_object_or_404(Account,id=account_id)  
-    if request.user != saving_goal.user_id:
+    saving_goal = get_object_or_404(Account,id=account_id)
+    if request.user != saving_goal.user:
         return redirect('financeAwareness:transactions')       
     else:
         saving_goal_form = SavingGoalForm(instance=saving_goal)

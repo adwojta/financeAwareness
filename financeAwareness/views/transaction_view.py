@@ -128,7 +128,7 @@ class AbstractCreateTransaction(LoginRequiredMixin,CreateView,AbstractTransactio
                 self.items_data.append(TransactionItemForm(User=request.user,data=data,type=self.category_type))
         
 
-    def post(self, request,is_planned=False, *args, **kwargs):    
+    def post(self, request,is_planned=False, *args, **kwargs):   
         self.transaction_form = self.form(data=request.POST,files=request.FILES,User=request.user)
         self.get_items_data(request)
         self.set_items_data_form(request,is_planned)
@@ -138,8 +138,7 @@ class AbstractCreateTransaction(LoginRequiredMixin,CreateView,AbstractTransactio
     def form_valid(self, request, *args, **kwargs):
         if self.transaction_form.is_valid():
             self.new_transaction = self.transaction_form.save(commit=False)
-
-            for item in self.items_data:
+            for item in self.items_data: 
                 if not item.is_valid():
                     self.items_valid= False
             if self.items_valid:
@@ -151,7 +150,7 @@ class AbstractCreateTransaction(LoginRequiredMixin,CreateView,AbstractTransactio
                 self.set_items()
 
     def get(self, request, *args, **kwargs):
-        self.transaction_item_forms = (TransactionItemForm(User=request.user,auto_id=False,type=self.category_type),)
+        self.transaction_item_forms = (TransactionItemForm(User=request.user,type=self.category_type),)
         self.transaction_form = self.form(User=request.user)
         return render(request, self.get_view,{'transaction_form': self.transaction_form,'transaction_item_forms': self.transaction_item_forms,'title':self.title,'is_not_planned':self.is_not_planned})
 
@@ -187,11 +186,9 @@ class AbstractUpdateTransaction(LoginRequiredMixin,UpdateView,AbstractTransactio
     def form_valid(self, request, *args, **kwargs):
         if self.transaction_form.is_valid():
             self.new_transaction = self.transaction_form.save(commit=False)
-
             for item in self.items_data:
                 if not item.is_valid():
                     self.items_valid= False
-            
             if self.items_valid:
                 new_image= bool(request.FILES)
                 if request.POST.__contains__('image-clear'):
@@ -212,7 +209,6 @@ class AbstractUpdateTransaction(LoginRequiredMixin,UpdateView,AbstractTransactio
         self.transaction = get_object_or_404(Transaction,id=kwargs['transaction_id'])
         if self.transaction.image:
             self.path = self.transaction.image.path
-        self.transaction_form = self.form(User=request.user,instance=self.transaction)
         self.transactionItems = self.transaction.items.all()
         self.old_value = self.transaction.value
         self.old_account = self.transaction.account
@@ -247,6 +243,7 @@ class AbstractUpdateTransaction(LoginRequiredMixin,UpdateView,AbstractTransactio
         self.form_valid(request)
 
     def get(self, request, *args, **kwargs):
+        self.transaction_form = self.form(User=request.user,instance=self.transaction)
         for item in self.transactionItems:
             self.transaction_item_forms.append(TransactionItemForm(User=request.user,instance=item,type=self.category_type))
 
@@ -287,12 +284,12 @@ class CreateIncome(AbstractCreateTransaction):
 class TransactionUpdate(AbstractUpdateTransaction):
     title = 'Zaktualizuj transakcje'
     form = TransactionForm
+    
 
     def form_valid(self, request, *args, **kwargs):
         super().form_valid(request, *args, **kwargs)
         self.update_transaction(request)
         account = self.new_transaction.account
-
         if self.transaction.type == 'expense':
             if self.old_account == self.new_transaction.account:
                 if self.old_value != self.new_transaction.value:
@@ -376,8 +373,8 @@ def get_categories(request):
 def search_transactions(request):
     max_in_page = 16
     title = 'Znalezione transakcje'
-    if request.method =='POST':
-        search_form = SearchForm(data=request.POST,user=request.user)
+    if request.GET:
+        search_form = SearchForm(data=request.GET,user=request.user)
         if search_form.is_valid():   
             clean_data = search_form.cleaned_data
             transactions = None
@@ -395,19 +392,19 @@ def search_transactions(request):
             
             if clean_data['date_from'] and clean_data['date_to'] and clean_data['date_to'] > clean_data['date_from']:
                 if transactions.exists():
-                    transactions = Transaction.objects.filter(date__range=[(clean_data['date_from']),(clean_data['date_to'] + datetime.timedelta(days=1))],user = request.user.id,type__in=['expense','income'])
-                else:               
                     transactions = transactions & Transaction.objects.filter(date__range=[(clean_data['date_from']),(clean_data['date_to'] + datetime.timedelta(days=1))],user = request.user.id,type__in=['expense','income'])
+                else:            
+                    transactions =  Transaction.objects.filter(date__range=[(clean_data['date_from']),(clean_data['date_to'] + datetime.timedelta(days=1))],user = request.user.id,type__in=['expense','income'])
 
-            if bool(request.POST['subcategories']) and int(request.POST['subcategories']) != -1:
-                category = request.POST['subcategories']
+            if bool(request.GET['subcategories']) and int(request.GET['subcategories']) != -1:
+                category = request.GET['subcategories']
                 if transactions.exists():
                     transactions = transactions & Transaction.objects.filter(id__in=TransactionItem.objects.filter(category=category).values('transaction').distinct())
                 else:
                     transactions = Transaction.objects.filter(id__in=TransactionItem.objects.filter(category=category).values('transaction').distinct(),type__in=['expense','income'])
-            elif bool(request.POST['categories']) and int(request.POST['categories']) != -1:
-                category = Category.objects.filter(user = request.user.id,master_category=request.POST['categories'])
-                category = category | Category.objects.filter(id=request.POST['categories'])
+            elif bool(request.GET['categories']) and int(request.GET['categories']) != -1:
+                category = Category.objects.filter(user = request.user.id,master_category=request.GET['categories'])
+                category = category | Category.objects.filter(id=request.GET['categories'])
                 if transactions.exists():
                     transactions = transactions & Transaction.objects.filter(id__in=TransactionItem.objects.filter(category__in=category).values('transaction').distinct(),type__in=['expense','income'])
                 else:
@@ -415,9 +412,9 @@ def search_transactions(request):
 
             if clean_data['planned']:
                 if transactions.exists():
-                    transactions = transactions & Transaction.objects.filter(id__in=TransactionItem.objects.filter(is_planned=clean_data['planned']).values('transaction').distinct())
+                    transactions = transactions & Transaction.objects.filter(id__in=TransactionItem.objects.filter(is_planned=clean_data['planned']).values('transaction').distinct(),type__in=['expense','income'])
                 else:
-                    transactions = Transaction.objects.filter(id__in=TransactionItem.objects.filter(is_planned=clean_data['planned']).values('transaction').distinct())
+                    transactions = Transaction.objects.filter(id__in=TransactionItem.objects.filter(is_planned=clean_data['planned']).values('transaction').distinct(),type__in=['expense','income'])
         
         paginator = Paginator(transactions,max_in_page)
         page_number = request.GET.get('page','1')

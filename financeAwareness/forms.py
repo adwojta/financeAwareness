@@ -72,20 +72,21 @@ class RecurringForm(forms.ModelForm):
         self.fields["description"].label = "Opis"
         self.fields["date"].label = "Data następnej transakcji"
         self.fields["tags"].label = "Tagi"
+        self.fields["recurring_type"].label = "Cykliczność"
 
         self.fields["name"].widget.attrs.update({'class': 'form-control',}) 
         self.fields["account"].widget.attrs.update({'class': 'form-control',}) 
         self.fields["value"].widget.attrs.update({'class': 'form-control',}) 
         self.fields["description"].widget.attrs.update({'class': 'form-control',}) 
         self.fields["date"].widget.attrs.update({'class': 'form-control',})
-        self.fields["reccuring_type"].widget.attrs.update({'class': 'form-control',})
+        self.fields["recurring_type"].widget.attrs.update({'class': 'form-control',})
         self.fields["tags"].required=False     
 
         self.fields['value'].widget.attrs['readonly'] = True
 
     class Meta:
         model = Transaction
-        fields = ('name','account','value','description','date','tags','reccuring_type')
+        fields = ('name','account','value','description','date','tags','recurring_type')
 
 class TransactionItemForm(forms.ModelForm):
 
@@ -157,7 +158,7 @@ class AccountForm(forms.ModelForm):
         self.fields["is_cash"].label = "Gotówka?"
 
         self.fields['name'].widget.attrs.update({'class': 'form-control',})
-        self.fields["is_cash"].widget.attrs.update({'class': 'form-check-input',})    
+        self.fields["is_cash"].widget.attrs.update({'class': 'form-check-input',})
 
     class Meta:
         model = Account
@@ -176,6 +177,10 @@ class SavingGoalForm(forms.ModelForm):
 
         for name in self.fields.keys():
             self.fields[name].widget.attrs.update({'class': 'form-control',})
+
+        self.fields["name"].required = True
+        self.fields["due_date"].required = True
+        self.fields["goal_value"].required = True
 
         self.fields["is_active_saving_goal"].widget.attrs.update({'class': 'form-check-input',})       
 
@@ -201,6 +206,7 @@ class TransferForm(forms.ModelForm):
         self.fields["date"].label = "Data"
         self.fields["account"].label = "Konto"
         self.fields["transfer_account"].label = "Konto docelowe"
+        self.fields["transfer_account"].required = True
 
         if saving_goal:
             self.fields["value"].widget.attrs['readonly'] = True
@@ -209,7 +215,6 @@ class TransferForm(forms.ModelForm):
     class Meta:
         model = Transaction
         fields = ('value','date','account','transfer_account')
-
 
 class TagForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):

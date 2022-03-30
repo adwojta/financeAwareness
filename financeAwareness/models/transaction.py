@@ -25,7 +25,7 @@ class Transaction(models.Model):
 
     transfer_account = models.ForeignKey(Account,on_delete=models.CASCADE,related_name="transfer",null=True,blank=True)
 
-    reccuring_type = models.CharField(choices=reccuringTypes,max_length=7,null=True)
+    recurring_type = models.CharField(choices=reccuringTypes,max_length=7,null=True)
     image = models.ImageField(upload_to=upload,blank=True,null=True)
 
     class Meta:

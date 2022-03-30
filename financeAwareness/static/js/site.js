@@ -9,24 +9,14 @@ function change_transaction_value(){
 }
 
 function add_item(){
-    let elem = document.getElementById('item_1');
-    let id = document.getElementsByClassName('transaction_item');
+    let elem = document.getElementById('item_template');
 
-    clone_div = elem.cloneNode(true);
-    new_div_id ='item_'+(parseInt(id[id.length-1].id.slice(5))+1)
-    clone_div.id = new_div_id
+    clone_div = elem.content.cloneNode(true);
     document.getElementById('items').appendChild(clone_div)
-
-    elem = document.getElementById(new_div_id);
-    elem.children[0].children[0].style.display=""
-    getSubcategories($(elem).find('Select[name="category"]'))
-
-    change_transaction_value()
-    
 }
 
 function delete_item(element){
-    $(element).parent().parent().remove()
+    $(element).parent().remove()
     change_transaction_value()
 }
 
@@ -38,8 +28,6 @@ function getSubcategories(element){
         data:{'category':category},
         success: function(response,status,jqXHR){
             if(jqXHR.status=="200"){
-                console.log($(element).nextAll('select').first())
-                console.log(element)
                 $(element).nextAll('select').first().empty()                                  
             data = JSON.parse(response['subcategories'])                 
             $.each(data, function(i, item){

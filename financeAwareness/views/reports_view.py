@@ -7,8 +7,9 @@ from financeAwareness.models.tag import Tag
 from financeAwareness.models.transaction import Transaction
 from financeAwareness.models.transactionItem import TransactionItem
 from financeAwareness.forms import DateForm
+from django.contrib.auth.decorators import login_required
 
-
+@login_required
 def reports_list(request):
     locale.setlocale(locale.LC_ALL,'pl_PL')
     month = datetime.now().month    
@@ -41,16 +42,23 @@ def reports_list(request):
     transactions = Transaction.objects.filter(user=request.user,type='expense',date__month=month)
     for category in categories:
         subcategories = Category.objects.filter(user=request.user,master_category=category)
-        category_value = 0
-        for subcategory in subcategories:
-            value = TransactionItem.objects.filter(transaction__in=transactions,category=subcategory).aggregate(Sum('item_value'))['item_value__sum']
-            if value == None:
-                continue
-            else:
-                category_value +=int(value)
-        if category_value > 0:
-            data_c_e.append(category_value)
-            labels_c_e.append(category.name)
+        if subcategories:
+            category_value = 0
+            for subcategory in subcategories:
+                value = TransactionItem.objects.filter(transaction__in=transactions,category=subcategory).aggregate(Sum('item_value'))['item_value__sum']
+                if value == None:
+                    continue
+                else:
+                    category_value +=int(value)
+            if category_value > 0:
+                data_c_e.append(category_value)
+                labels_c_e.append(category.name)
+        else:
+            value = TransactionItem.objects.filter(transaction__in=transactions,category=category).aggregate(Sum('item_value'))['item_value__sum']
+            if value:
+                if value > 0:
+                    data_c_e.append(value)
+                    labels_c_e.append(category.name)
 
     #Planned
     labels_planned =['Zaplanowane','Nieplanowane']
@@ -88,13 +96,14 @@ def reports_list(request):
     'labels_planned':labels_planned,'data_planned':data_planned,
     'labels_tags':labels_tags,'data_tags':data_tags})
 
+@login_required
 def expense_income_details_report(request):
     labels =[]
     data =[]
-    if request.method == 'POST':
-        date_form = DateForm(data=request.POST)
-        date_from = datetime.strptime(request.POST['date_from'],'%d.%m.%Y') 
-        date_to =  datetime.strptime(request.POST['date_to'],'%d.%m.%Y')
+    if request.GET:
+        date_form = DateForm(data=request.GET)
+        date_from = datetime.strptime(request.GET['date_from'],'%d.%m.%Y') 
+        date_to =  datetime.strptime(request.GET['date_to'],'%d.%m.%Y')
         labels =['Wydatek','Przychód']
         expense = Transaction.objects.filter(user=request.user,type='expense',date__range=[date_from,date_to]).aggregate(Sum('value'))['value__sum']
         income = Transaction.objects.filter(user=request.user,type='income',date__range=[date_from,date_to]).aggregate(Sum('value'))['value__sum']    
@@ -117,6 +126,7 @@ def expense_income_details_report(request):
         data = [int(expense),int(income)]
     return render(request, 'views/report/report_expense_income.html',{'date_form':date_form,'labels':labels,'data':data})
 
+@login_required
 def category_details_report(request):
     labels =[]
     data =[]
@@ -126,36 +136,44 @@ def category_details_report(request):
     data_income =[]
     labels_income_subcategories =[]
     data_income_subcategories =[]
-    most_value = 0
     most_value_category = ''
 
-    if request.method == 'POST':
-        date_form = DateForm(data=request.POST,user = request.user)
-        date_from = datetime.strptime(request.POST['date_from'],'%d.%m.%Y') 
-        date_to =  datetime.strptime(request.POST['date_to'],'%d.%m.%Y')
-        category_expense = request.POST['category_expense']
-        category_income = request.POST['category_income']
+    if request.GET:
+        date_form = DateForm(data=request.GET,user = request.user)
+        date_from = datetime.strptime(request.GET['date_from'],'%d.%m.%Y') 
+        date_to =  datetime.strptime(request.GET['date_to'],'%d.%m.%Y')
+        category_expense = request.GET['category_expense']
+        category_income = request.GET['category_income']
         categories = Category.objects.filter(user=request.user,master_category=None)
         transactions = Transaction.objects.filter(user=request.user,type='expense',date__range=[date_from,date_to])
         for category in categories:
             subcategories = Category.objects.filter(user=request.user,master_category=category)
-            category_value = 0
+            category_value = TransactionItem.objects.filter(transaction__in=transactions,category=category).aggregate(Sum('item_value'))['item_value__sum']
+            if category_value:
+                category_value = int(category_value)
+            else:
+                category_value = 0
+                
             for subcategory in subcategories:
                 value = TransactionItem.objects.filter(transaction__in=transactions,category=subcategory).aggregate(Sum('item_value'))['item_value__sum']
                 if value == None:
                     continue
                 else:
-                    if value > most_value:
-                        most_value_category = category
-                        most_value = value
                     category_value +=int(value)
             if category_value > 0:
                 data.append(category_value)
-                labels.append(category.name)
-
+                labels.append(category.name)    
         
         if category_expense =="":
+            if data:
+                most_value_category = Category.objects.get(user=request.user,name=labels[0],master_category=None)
+                min_value = min(data)
+                for i,category in enumerate(data):
+                    if min_value < category:
+                        min_value = category
+                        most_value_category = Category.objects.get(user=request.user,name=labels[i])
             category_expense = most_value_category
+
         if category_expense !="":
             subcategories = Category.objects.filter(user=request.user,master_category=category_expense)
             for subcategory in subcategories:
@@ -170,22 +188,32 @@ def category_details_report(request):
         transactions = Transaction.objects.filter(user=request.user,type='income',date__range=[date_from,date_to])
         for category in categories:
             subcategories = Category.objects.filter(user=request.user,master_category=category)
-            category_value = 0
+            category_value = TransactionItem.objects.filter(transaction__in=transactions,category=category).aggregate(Sum('item_value'))['item_value__sum']
+            if category_value:
+                category_value = int(category_value)
+            else:
+                category_value = 0
             for subcategory in subcategories:
                 value = TransactionItem.objects.filter(transaction__in=transactions,category=subcategory).aggregate(Sum('item_value'))['item_value__sum']
                 if value == None:
                     continue
                 else:
-                    if value > most_value:
-                        most_value_category = category
-                        most_value = value
                     category_value +=int(value)
             if category_value > 0:
                 data_income.append(category_value)
                 labels_income.append(category.name)
-       
+        
+        most_value_category =""
         if category_income =="":
-            category_income = most_value_category
+            if data_income:
+                most_value_category = Category.objects.get(user=request.user,name=labels_income[0],master_category=None)
+                min_value = min(data_income)
+                for i,category in enumerate(data):
+                    if min_value < category:
+                        min_value = category
+                        most_value_category = Category.objects.get(user=request.user,name=labels_income[i])
+                category_income = most_value_category
+
         if category_income !="":
             subcategories = Category.objects.filter(user=request.user,master_category=category_income)
             for subcategory in subcategories:
@@ -204,19 +232,28 @@ def category_details_report(request):
         transactions = Transaction.objects.filter(user=request.user,type='expense',date__month=month)
         for category in categories:
             subcategories = Category.objects.filter(user=request.user,master_category=category)
-            category_value = 0
+            category_value = TransactionItem.objects.filter(transaction__in=transactions,category=category).aggregate(Sum('item_value'))['item_value__sum']
+            if category_value:
+                category_value = int(category_value)
+            else:
+                category_value = 0
             for subcategory in subcategories:
                 value = TransactionItem.objects.filter(transaction__in=transactions,category=subcategory).aggregate(Sum('item_value'))['item_value__sum']
                 if value == None:
                     continue
                 else:
-                    if value > most_value:
-                        most_value_category = category
-                        most_value = value
                     category_value +=int(value)
             if category_value > 0:
                 data.append(category_value)
                 labels.append(category.name)
+
+            if data:
+                most_value_category = Category.objects.get(user=request.user,name=labels[0],master_category=None)
+                min_value = min(data)
+                for i,category in enumerate(data):
+                    if min_value < category:
+                        min_value = category
+                        most_value_category = Category.objects.get(user=request.user,name=labels[i])
 
         subcategories = Category.objects.filter(user=request.user,master_category=most_value_category)
         for subcategory in subcategories:
@@ -227,26 +264,34 @@ def category_details_report(request):
                 if value > 0:
                     data_subcategories.append(int(value))
                     labels_subcategories.append(subcategory.name)
-        
-        most_value_category = ''
-        most_value = 0
+
         transactions = Transaction.objects.filter(user=request.user,type='income',date__month=month)
         for category in categories:
             subcategories = Category.objects.filter(user=request.user,master_category=category)
-            category_value = 0
+            category_value = TransactionItem.objects.filter(transaction__in=transactions,category=category).aggregate(Sum('item_value'))['item_value__sum']
+            if category_value:
+                category_value = int(category_value)
+            else:
+                category_value = 0
             for subcategory in subcategories:
                 value = TransactionItem.objects.filter(transaction__in=transactions,category=subcategory).aggregate(Sum('item_value'))['item_value__sum']
                 if value == None:
                     continue
                 else:
-                    if value > most_value:
-                        most_value_category = category
-                        most_value = value
                     category_value +=int(value)
             if category_value > 0:
                 data_income.append(category_value)
                 labels_income.append(category.name)
-       
+
+        most_value_category = ''
+        if data_income:
+            most_value_category = Category.objects.get(user=request.user,name=labels_income[0],master_category=None)
+            min_value = min(data_income)
+            for i,category in enumerate(data):
+                if min_value < category:
+                    min_value = category
+                    most_value_category = Category.objects.get(user=request.user,name=labels_income[i])
+        
         subcategories = Category.objects.filter(user=request.user,master_category=most_value_category)
         for subcategory in subcategories:
             value = TransactionItem.objects.filter(transaction__in=transactions,category=subcategory).aggregate(Sum('item_value'))['item_value__sum']
@@ -258,18 +303,20 @@ def category_details_report(request):
                     labels_income_subcategories.append(subcategory.name)
 
     return render(request, 'views/report/report_category.html',
-    {'date_form':date_form,'labels':labels,'data':data,
+    {'date_form':date_form,
+    'labels':labels,'data':data,
     'labels_subcategories':labels_subcategories,'data_subcategories':data_subcategories,
     'labels_income':labels_income,'data_income':data_income,
     'labels_income_subcategories':labels_income_subcategories,'data_income_subcategories':data_income_subcategories})
 
+@login_required
 def tags_details_report(request):
     labels =[]
     data =[]
-    if request.method == 'POST':
-        date_form = DateForm(data=request.POST)
-        date_from = datetime.strptime(request.POST['date_from'],'%d.%m.%Y') 
-        date_to =  datetime.strptime(request.POST['date_to'],'%d.%m.%Y')
+    if request.GET:
+        date_form = DateForm(data=request.GET)
+        date_from = datetime.strptime(request.GET['date_from'],'%d.%m.%Y') 
+        date_to =  datetime.strptime(request.GET['date_to'],'%d.%m.%Y')
         tags = Tag.objects.filter(user=request.user)
         if tags != None:
             for tag in tags:
@@ -296,13 +343,14 @@ def tags_details_report(request):
 
     return render(request, 'views/report/report_tag.html',{'date_form':date_form,'labels':labels,'data':data})
 
+@login_required
 def planned_details_report(request):
     labels =[]
     data =[]
-    if request.method == 'POST':
-        date_form = DateForm(data=request.POST)
-        date_from = datetime.strptime(request.POST['date_from'],'%d.%m.%Y') 
-        date_to =  datetime.strptime(request.POST['date_to'],'%d.%m.%Y')
+    if request.GET:
+        date_form = DateForm(data=request.GET)
+        date_from = datetime.strptime(request.GET['date_from'],'%d.%m.%Y') 
+        date_to =  datetime.strptime(request.GET['date_to'],'%d.%m.%Y')
         transactions = Transaction.objects.filter(user=request.user,type='expense',date__range=[date_from,date_to])
         labels =['Zaplanowane','Nieplanowane']
         value = TransactionItem.objects.filter(transaction__in=transactions,is_planned=True).aggregate(Sum('item_value'))['item_value__sum']
@@ -332,6 +380,7 @@ def planned_details_report(request):
 
     return render(request, 'views/report/report_planned.html',{'date_form':date_form,'labels':labels,'data':data})
 
+@login_required
 def recurring_details_report(request):
     
     labels=[]
@@ -345,10 +394,10 @@ def recurring_details_report(request):
     data_quarter=[]
     data_year=[]
     month = datetime.now().month
-    if request.method == 'POST':
-        date_from = datetime.strptime(request.POST['date_from'],'%d.%m.%Y') 
-        date_to =  datetime.strptime(request.POST['date_to'],'%d.%m.%Y')
-        date_form = DateForm(data=request.POST)
+    if request.GET:
+        date_from = datetime.strptime(request.GET['date_from'],'%d.%m.%Y') 
+        date_to =  datetime.strptime(request.GET['date_to'],'%d.%m.%Y')
+        date_form = DateForm(data=request.GET)
         expense = Transaction.objects.filter(user=request.user,type='recurringExpense',date__range=[date_from,date_to]).aggregate(Sum('value'))['value__sum']
         income = Transaction.objects.filter(user=request.user,type='recurringIncome',date__range=[date_from,date_to]).aggregate(Sum('value'))['value__sum']    
         if expense != None:
@@ -369,8 +418,8 @@ def recurring_details_report(request):
             labels.append('Przychód')
             data.append(int(income))    
 
-    expense = Transaction.objects.filter(user=request.user,type='recurringExpense', reccuring_type='week').aggregate(Sum('value'))['value__sum']
-    income = Transaction.objects.filter(user=request.user,type='recurringIncome', reccuring_type='week').aggregate(Sum('value'))['value__sum']    
+    expense = Transaction.objects.filter(user=request.user,type='recurringExpense', recurring_type='week').aggregate(Sum('value'))['value__sum']
+    income = Transaction.objects.filter(user=request.user,type='recurringIncome', recurring_type='week').aggregate(Sum('value'))['value__sum']    
     if expense != None:
         labels_week.append('Wydatek')
         data_week.append(int(expense))
@@ -378,8 +427,8 @@ def recurring_details_report(request):
         labels_week.append('Przychód')
         data_week.append(int(income)) 
 
-    expense = Transaction.objects.filter(user=request.user,type='recurringExpense', reccuring_type='quarter').aggregate(Sum('value'))['value__sum']
-    income = Transaction.objects.filter(user=request.user,type='recurringIncome', reccuring_type='quarter').aggregate(Sum('value'))['value__sum']    
+    expense = Transaction.objects.filter(user=request.user,type='recurringExpense', recurring_type='quarter').aggregate(Sum('value'))['value__sum']
+    income = Transaction.objects.filter(user=request.user,type='recurringIncome', recurring_type='quarter').aggregate(Sum('value'))['value__sum']    
     if expense != None:
         labels_quarter.append('Wydatek')
         data_quarter.append(int(expense))
@@ -387,8 +436,8 @@ def recurring_details_report(request):
         labels_quarter.append('Przychód')
         data_quarter.append(int(income)) 
 
-    expense = Transaction.objects.filter(user=request.user,type='recurringExpense', reccuring_type='year').aggregate(Sum('value'))['value__sum']
-    income = Transaction.objects.filter(user=request.user,type='recurringIncome', reccuring_type='year').aggregate(Sum('value'))['value__sum']    
+    expense = Transaction.objects.filter(user=request.user,type='recurringExpense', recurring_type='year').aggregate(Sum('value'))['value__sum']
+    income = Transaction.objects.filter(user=request.user,type='recurringIncome', recurring_type='year').aggregate(Sum('value'))['value__sum']    
     if expense != None:
         labels_year.append('Wydatek')
         data_year.append(int(expense))
@@ -396,8 +445,8 @@ def recurring_details_report(request):
         labels_year.append('Przychód')
         data_year.append(int(income))         
 
-    expense = Transaction.objects.filter(user=request.user,type='recurringExpense', reccuring_type='month').aggregate(Sum('value'))['value__sum']
-    income = Transaction.objects.filter(user=request.user,type='recurringIncome', reccuring_type='month').aggregate(Sum('value'))['value__sum']    
+    expense = Transaction.objects.filter(user=request.user,type='recurringExpense', recurring_type='month').aggregate(Sum('value'))['value__sum']
+    income = Transaction.objects.filter(user=request.user,type='recurringIncome', recurring_type='month').aggregate(Sum('value'))['value__sum']    
     if expense != None:
         labels_month.append('Wydatek')
         data_month.append(int(expense))
@@ -416,7 +465,8 @@ def recurring_details_report(request):
             data_all.append(int(recurring.value))
         
     return render(request, 'views/report/report_recurring.html',
-    {'date_form':date_form,'labels':labels,'data':data,
+    {'date_form':date_form,
+    'labels':labels,'data':data,
     'data_week':data_week,'labels_week':labels_week,
     'data_quarter':data_quarter,'labels_quarter':labels_quarter,
     'data_year':data_year,'labels_year':labels_year,

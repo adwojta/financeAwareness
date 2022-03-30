@@ -67,7 +67,6 @@ class PlannedAdd(AbstractUpdateTransaction):
             account.value = account.value - self.new_transaction.value
             
             account.save()
-                
             self.new_transaction.type = 'expense'
             self.new_transaction.save()
 

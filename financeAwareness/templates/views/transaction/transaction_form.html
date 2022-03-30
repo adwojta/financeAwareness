@@ -54,4 +54,22 @@
         </form>
         </div>
     </div>
+<template id=item_template>
+    <div style="background-color: rgb(188, 210, 224);border-radius: 5px; margin-bottom: 1em;" id='item_new' class='transaction_item'>
+        <input class="btn btn-secondary" type="button" onclick="delete_item(this)" value="Usuń element" style="width:100%">
+        {{transaction_item_forms.0.item_name.label_tag}}
+        {{transaction_item_forms.0.item_name}}
+        {{transaction_item_forms.0.category.label_tag}}  
+        {{transaction_item_forms.0.category}}
+        {{transaction_item_forms.0.subcategory.label_tag}}
+        {{transaction_item_forms.0.subcategory}}
+        {{transaction_item_forms.0.item_value.label_tag}}
+        {{transaction_item_forms.0.item_value}}
+        {% if is_not_planned %}
+        {{transaction_item_forms.0.is_planned.label_tag}}
+        {{transaction_item_forms.0.is_planned}}
+        {% endif %}
+    </div> 
+</template>
+
 {% endblock %}

@@ -19,6 +19,13 @@
 #expense{
     background-color: rgba(240, 105, 105, 0.644);
 }
+
+#tags{
+    background-color: rgba(70, 183, 236, 0.349);
+    border-radius: 3px;
+    font-weight: bold;
+}
+
 ul {
     list-style-type: none;
 }

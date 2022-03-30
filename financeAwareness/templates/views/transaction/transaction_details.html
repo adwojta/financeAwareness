@@ -8,10 +8,25 @@
         <p>{{transaction.name}}</p>
         <p>Data: {{transaction.date}}</p>
         <p>Wartość: {{transaction.value}}</p>
+        
+        <p>Tagi: {% for tag in transaction.tags.all %}<span id=tags> {{tag}}</span> {%endfor%}</p>
         <div class="d-grid gap-2">   
         {%if transaction.image %}
         <img src = '{{transaction.image.url}}' class="img-thumbnail mx-auto d-block" style="max-height: 500px;max-width: 500px" alt=""/>
-        {%endif%}     
+        {%endif%}
+        {%if transaction.type == "recurringIncome" or transaction.type == "recurringExpense" %}
+
+        {%if transaction.recurring_type == "month" %}
+        <p>Miesieczna</p>
+        {%elif transaction.recurring_type == "week" %}
+        <p>Tygodniowa</p>
+        {%elif transaction.recurring_type == "year" %}
+        <p>Roczna</p>
+        {%elif transaction.recurring_type == "quarter" %}
+        <p>Kwartalna</p>
+
+        {%endif%}
+        {%endif%}          
         {% if transaction.type == "recurringIncome" or transaction.type == "recurringExpense" %}
         <a class="btn btn-primary" href="{% url "financeAwareness:recurrings" %}">Powrót</a>
         <a class="btn btn-secondary" href="{% url "financeAwareness:recurring_form_update" transaction.id %}">Edycja</a>

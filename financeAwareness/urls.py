@@ -17,12 +17,11 @@ urlpatterns = [
 
     #transaction
     path('dashboard',views.TransactionListView.as_view(),name='transactions'),
-    path('transaction/<int:transaction_id>',views.TransactionDetailView.as_view(),name='transaction_details'),
-    
+    path('transaction/<int:transaction_id>',views.TransactionDetailView.as_view(),name='transaction_details'),  
     path('transaction/expense/new',views.CreateExpense.as_view(),name='new_expense'),
     path('transaction/income/new',views.CreateIncome.as_view(),name='new_income'),
-    path('transaction/<int:transaction_id>/update/',views.TransactionUpdate.as_view(),name='transaction_form_update'),
-    path('transaction/<int:id>/delete/',views.TransactionDelete.as_view(),name='transaction_form_delete'),
+    path('transaction/<int:transaction_id>/update',views.TransactionUpdate.as_view(),name='transaction_form_update'),
+    path('transaction/<int:id>/delete',views.TransactionDelete.as_view(),name='transaction_form_delete'),
     path('transaction/ajax/subcategories',views.get_subcategories,name='ajaxSubcategories'),
     path('transaction/ajax/categories',views.get_categories,name='ajaxCategories'),
     path('transaction/search',views.search_transactions,name='search_transactions'),
@@ -59,13 +58,13 @@ urlpatterns = [
     path('subcategories/delete/<int:id>',views.SubcategoryDelete.as_view(),name='subcategory_form_delete'),
 
     #tag
-    path('tags/',views.tag_list,name='tags'),
+    path('tags',views.tag_list,name='tags'),
     path('tags/new',views.tag_form,name='new_tag'),
     path('tags/update/<int:tag_id>',views.tag_form_update,name='tag_form_update'),
     path('tags/delete/<int:id>',views.TagDelete.as_view(),name='tag_form_delete'),
 
     #account
-    path('accounts/',views.account_list,name='accounts'),
+    path('accounts',views.account_list,name='accounts'),
     path('accounts/new',views.account_form,name='new_account'),
     path('accounts/update/<int:account_id>',views.account_form_update,name='account_form_update'),
     path('accounts/delete/<int:id>',views.AccountDelete.as_view(),name='account_form_delete'),
@@ -82,7 +81,7 @@ urlpatterns = [
     path('savings/delete/<int:id>',views.GoalDelete.as_view(),name='saving_goal_form_delete'),
 
     #reports
-    path('reports/',views.reports_list,name='reports_list'),
+    path('reports',views.reports_list,name='reports_list'),
     path('reports/category',views.category_details_report,name='report_category_details'),
     path('reports/tags',views.tags_details_report,name='report_tags_details'),
     path('reports/planned',views.planned_details_report,name='report_planned_details'),

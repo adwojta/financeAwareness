@@ -76,23 +76,22 @@ class RecurringAdd(AbstractUpdateTransaction):
             
             account.save()
 
-            if recurring_transaction.reccuring_type == 'month':
+            if recurring_transaction.recurring_type == 'month':
                 recurring_transaction.date = recurring_transaction.date + relativedelta(months=1)
-            elif recurring_transaction.reccuring_type == 'quarter':
+            elif recurring_transaction.recurring_type == 'quarter':
                 recurring_transaction.date = recurring_transaction.date + relativedelta(months=3)
-            elif recurring_transaction.reccuring_type == 'year':
+            elif recurring_transaction.recurring_type == 'year':
                 recurring_transaction.date = recurring_transaction.date + relativedelta(years=1)
-            elif recurring_transaction.reccuring_type == 'week':
+            elif recurring_transaction.recurring_type == 'week':
                 recurring_transaction.date = recurring_transaction.date + relativedelta(weeks=1)
 
             if recurring_transaction.type =='recurringExpense':
                 self.new_transaction.type = 'expense'
             else:
                 self.new_transaction.type = 'income'
-            
             recurring_transaction.save()
             self.new_transaction.save()
             self.transaction = Transaction.objects.latest('id')
-            
+
             self.set_tags()
             self.set_items(new_items=True)
