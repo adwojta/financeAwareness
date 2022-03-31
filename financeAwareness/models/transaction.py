@@ -12,7 +12,7 @@ def upload(instance,filename):
 
 class Transaction(models.Model):
     types=(('income','Przychód'),('expense','Wydatek'),('planned','Zaplanowana'),('recurringExpense','Stały wydatek'),('recurringIncome','Stały przychód'),('transfer','Transfer'))
-    reccuringTypes=(('month','Miesiąc'),('quarter','Kwartał'),('year','Rok'),('week','Tydzień'))
+    recurring_types=(('month','Miesiąc'),('quarter','Kwartał'),('year','Rok'),('week','Tydzień'))
 
     name = models.CharField(max_length=100)
     user = models.ForeignKey(User,on_delete=models.CASCADE,related_name="transactions")
@@ -25,7 +25,7 @@ class Transaction(models.Model):
 
     transfer_account = models.ForeignKey(Account,on_delete=models.CASCADE,related_name="transfer",null=True,blank=True)
 
-    recurring_type = models.CharField(choices=reccuringTypes,max_length=7,null=True)
+    recurring_type = models.CharField(choices=recurring_types,max_length=7,null=True)
     image = models.ImageField(upload_to=upload,blank=True,null=True)
 
     class Meta:

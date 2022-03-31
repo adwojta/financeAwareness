@@ -8,7 +8,7 @@ from financeAwareness.models.category import Category
 income = ('Przychód',('Wynagrodzenie','Wynajem','Zwroty','Sprzedaż','Inne'))
 
 expense = (('Zakupy',('Sprzęt elektroniczny','Sport','Odzież','Obuwie','Prezenty','Biżuteria','Zabawki')),
-('Dom',('Środki czystości','Meble','Narzędzia','Wyposażenie kuchnii')),
+('Dom',('Środki czystości','Meble','Narzędzia','Wyposażenie kuchni')),
 ('Transport',('Parking','Paliwo','Taksówka','Samochód','Transport publiczny','Inne')),
 ('Rozrywka',('Kino','Teatr','Gry','Książki','Koncert','Bar','Kawiarnia')),
 ('Używki',('Tytoń','Alkohol')),

@@ -80,7 +80,7 @@ def reports_list(request):
     tags = Tag.objects.filter(user=request.user)
     if tags != None:
         for tag in tags:
-            value = Transaction.objects.filter(tags=tag,date__month=month).aggregate(Sum('value'))['value__sum']
+            value = Transaction.objects.filter(tags=tag,date__month=month,type='expense').aggregate(Sum('value'))['value__sum']
             if value == None:
                 value = 0
             else:
@@ -322,7 +322,7 @@ def tags_details_report(request):
         tags = Tag.objects.filter(user=request.user)
         if tags != None:
             for tag in tags:
-                value = Transaction.objects.filter(tags=tag,date__range=[date_from,date_to]).aggregate(Sum('value'))['value__sum']
+                value = Transaction.objects.filter(tags=tag,date__range=[date_from,date_to],type='expense').aggregate(Sum('value'))['value__sum']
                 if value == None:
                     value = 0
                 else:
@@ -336,7 +336,7 @@ def tags_details_report(request):
         tags = Tag.objects.filter(user=request.user)
         if tags != None:
             for tag in tags:
-                value = Transaction.objects.filter(tags=tag,date__month=month).aggregate(Sum('value'))['value__sum']
+                value = Transaction.objects.filter(tags=tag,date__month=month,type='expense').aggregate(Sum('value'))['value__sum']
                 if value == None:
                     value = 0
                 else:
