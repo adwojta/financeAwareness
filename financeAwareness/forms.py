@@ -221,6 +221,7 @@ class TagForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['name'] = forms.CharField()
         self.fields['name'].widget.attrs.update({'class': 'form-control',})
+        self.fields["name"].label = "Nazwa tagu"
 
     class Meta:
         model = Tag

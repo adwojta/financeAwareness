@@ -27,4 +27,6 @@ class AbstractDelete(LoginRequiredMixin,TemplateView,ABC):
         return render(request, self.get_view,{'delete_type':self.delete_type,"title":self.title,'id':self.id})
 
 def index(request):
+    if request.user.is_authenticated:
+        return redirect('financeAwareness:transactions')
     return render(request,'index.html')

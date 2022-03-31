@@ -13,27 +13,30 @@ def available_funds(user):
     sum = Account.objects.filter(user_id=user,is_saving_goal=False).aggregate(Sum('value'))
 
     if not sum['value__sum']:
-        sum['value__sum']='0.0'
-
-    return sum['value__sum']
+        value = '0.0'
+    else:
+        value = round(sum['value__sum'],2)
+    return value
 
 @register.simple_tag
 def available_funds_cash(user):
     sum = Account.objects.filter(user_id=user,is_cash=True,is_saving_goal=False).aggregate(Sum('value'))
 
     if not sum['value__sum']:
-        sum['value__sum']='0.0'
-
-    return sum['value__sum']
+        value = '0.0'
+    else:
+        value = round(sum['value__sum'],2)
+    return value
 
 @register.simple_tag
 def available_funds_bank(user):
     sum = Account.objects.filter(user_id=user,is_cash=False,is_saving_goal=False).aggregate(Sum('value'))
 
     if not sum['value__sum']:
-        sum['value__sum']='0.0'
-
-    return sum['value__sum']
+        value = '0.0'
+    else:
+        value = round(sum['value__sum'],2)
+    return value
 
 @register.inclusion_tag('saving_goal_active.html')
 def active_goal(user):

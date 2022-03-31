@@ -255,15 +255,16 @@ def category_details_report(request):
                         min_value = category
                         most_value_category = Category.objects.get(user=request.user,name=labels[i])
 
-        subcategories = Category.objects.filter(user=request.user,master_category=most_value_category)
-        for subcategory in subcategories:
-            value = TransactionItem.objects.filter(transaction__in=transactions,category=subcategory).aggregate(Sum('item_value'))['item_value__sum']
-            if value == None:
-                continue
-            else:
-                if value > 0:
-                    data_subcategories.append(int(value))
-                    labels_subcategories.append(subcategory.name)
+        if most_value_category:
+            subcategories = Category.objects.filter(user=request.user,master_category=most_value_category)
+            for subcategory in subcategories:
+                value = TransactionItem.objects.filter(transaction__in=transactions,category=subcategory).aggregate(Sum('item_value'))['item_value__sum']
+                if value == None:
+                    continue
+                else:
+                    if value > 0:
+                        data_subcategories.append(int(value))
+                        labels_subcategories.append(subcategory.name)
 
         transactions = Transaction.objects.filter(user=request.user,type='income',date__month=month)
         for category in categories:
@@ -292,15 +293,16 @@ def category_details_report(request):
                     min_value = category
                     most_value_category = Category.objects.get(user=request.user,name=labels_income[i])
         
-        subcategories = Category.objects.filter(user=request.user,master_category=most_value_category)
-        for subcategory in subcategories:
-            value = TransactionItem.objects.filter(transaction__in=transactions,category=subcategory).aggregate(Sum('item_value'))['item_value__sum']
-            if value == None:
-                continue
-            else:
-                if value > 0:
-                    data_income_subcategories.append(int(value))
-                    labels_income_subcategories.append(subcategory.name)
+        if most_value_category:
+            subcategories = Category.objects.filter(user=request.user,master_category=most_value_category)
+            for subcategory in subcategories:
+                value = TransactionItem.objects.filter(transaction__in=transactions,category=subcategory).aggregate(Sum('item_value'))['item_value__sum']
+                if value == None:
+                    continue
+                else:
+                    if value > 0:
+                        data_income_subcategories.append(int(value))
+                        labels_income_subcategories.append(subcategory.name)
 
     return render(request, 'views/report/report_category.html',
     {'date_form':date_form,

@@ -16,7 +16,7 @@
                         <a class="btn btn-primary" href="{% url "financeAwareness:new_category" "income" %}">Dodaj</a>
                     </div>  
                 </div>
-                <div class="row mt-1 g-4">
+                <div class="row row-cols-1 row-cols-lg-2">
                 {% for income in incomes %}
                 <div class="col">
                     <div class="card-body">                  
@@ -40,7 +40,7 @@
                         <a class="btn btn-primary" href="{% url "financeAwareness:new_category" %}">Dodaj</a>
                     </div>  
                 </div>
-                <div class="row mt-1 g-4">
+                <div class="row row-cols-1 row-cols-lg-2">
                 {% for expense in expenses %}               
                     <div class="col">
                         <div class="card-body">                   
